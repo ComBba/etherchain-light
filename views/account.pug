@@ -176,13 +176,13 @@ block content
                       td
                         a(href="/block/" + trace.blockNumber) #{trace.blockNumber}
                       if trace.action.rewardType === "uncle"
-                        td Mining Reward(Uncle)
+                        td Uncle Reward
                       else
                         td Mining Reward
                       td
                         span.glyphicon.glyphicon-gift(style="color: blue;")
                       td New Coins
-                      td #{trace.action.author} #{nameformatter.format(trace.action.author)}
+                      td #{nameformatter.format(trace.action.author)}
                       td(align="right") #{ethformatter(trace.action.value)}
                       td #{trace.isContract}
                   else if trace.type !== "reward"
@@ -205,20 +205,20 @@ block content
                             span.glyphicon.glyphicon-new-window(style="color: blue;")
                         td
                           if trace.action.from === account.address
-                            a(href="/account/" + trace.action.from) #{nameformatter.format(trace.action.from)}
-                          else 
                             |#{nameformatter.format(trace.action.from)}
+                          else 
+                            a(href="/account/" + trace.action.from) #{nameformatter.format(trace.action.from)}
                         td 
                           if trace.action._to !== ''
                             if trace.action._to === account.address
-                              a(href="/account/" + trace.action._to) #{nameformatter.format(trace.action._to)}
-                            else
                               |#{nameformatter.format(trace.action._to)}
+                            else
+                              a(href="/account/" + trace.action._to) #{nameformatter.format(trace.action._to)}
                           else
                             if trace.action.to === account.address
-                              a(href="/account/" + trace.action.to) #{nameformatter.format(trace.action.to)}
-                            else
                               |#{nameformatter.format(trace.action.to)}
+                            else
+                              a(href="/account/" + trace.action.to) #{nameformatter.format(trace.action.to)}
                         if trace.action._value !== ''
                           td(align="right") #{tokenformatter.format(trace.action._value, trace.token_decimals, trace.token_symbol)}
                         else
@@ -229,14 +229,14 @@ block content
                           span.glyphicon.glyphicon-asterisk(style="color: blue;")
                         td
                           if trace.action.from === account.address
-                            a(href="/account/" + trace.action.from) #{nameformatter.format(trace.action.from)}
-                          else
                             |#{nameformatter.format(trace.action.from)}
+                          else
+                            a(href="/account/" + trace.action.from) #{nameformatter.format(trace.action.from)}
                         td
                           if trace.result.address === account.address
-                            a(href="/account/" + trace.result.address) #{nameformatter.format(trace.result.address)}
-                          else
                             |#{nameformatter.format(trace.result.address)}
+                          else
+                            a(href="/account/" + trace.result.address) #{nameformatter.format(trace.result.address)}
                         td(align="right") #{tokenformatter.format(trace.action.value, trace.token_decimals, trace.token_symbol)}
                         td #{trace.isContract}
                       else if trace.type === "suicide"
@@ -246,9 +246,15 @@ block content
                           else
                             span.glyphicon.glyphicon-import(style="color: green;")
                         td
-                          a(href="/account/" + trace.action.address) #{nameformatter.format(trace.action.address)}
+                          if trace.action.address === account.address
+                            |#{nameformatter.format(trace.action.address)}
+                          else
+                            a(href="/account/" + trace.action.address) #{nameformatter.format(trace.action.address)}
                         td
-                          a(href="/account/" + trace.action.refundAddress) #{nameformatter.format(trace.action.refundAddress)}
+                          if trace.action.refundAddress === account.address
+                            |#{nameformatter.format(trace.action.refundAddress)}
+                          else
+                            a(href="/account/" + trace.action.refundAddress) #{nameformatter.format(trace.action.refundAddress)}
                         td(align="right") #{ethformatter(trace.action.balance)}
                         td #{trace.isContract}
         if account.tokenBlocks
@@ -286,14 +292,14 @@ block content
                           span.glyphicon.glyphicon-log-in(style="color: green;")
                       td
                         if trace.args._from === account.address
-                          a(href="/account/" + trace.args._from) #{nameformatter.format(trace.args._from)}
-                        else
                           |#{nameformatter.format(trace.args._from)}
+                        else
+                          a(href="/account/" + trace.args._from) #{nameformatter.format(trace.args._from)}
                       td
                         if trace.args._to === account.address
-                          a(href="/account/" + trace.args._to) #{nameformatter.format(trace.args._to)}
-                        else
                           |#{nameformatter.format(trace.args._to)}
+                        else
+                          a(href="/account/" + trace.args._to) #{nameformatter.format(trace.args._to)}
                       td(align="right") #{tokenformatter.format(trace.args._value, trace.token_decimals, trace.token_symbol)}
         if account.isContract
           //
