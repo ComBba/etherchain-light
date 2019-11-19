@@ -191,7 +191,8 @@ router.get('/:block', function (req, res, next) {
           });
         } else {
           //console.dir(block);
-          redis.set(cacheRedisKey.concat(req.params.block), JSON.stringify(block))
+          redis.set(cacheRedisKey.concat(block.number), JSON.stringify(block))
+          redis.set(cacheRedisKey.concat(block.hash), JSON.stringify(block))
           res.render('block', {
             block: block
           });
