@@ -110,7 +110,7 @@ router.get('/:tx', function (req, res, next) {
     // If that key exists in Redis store
     if (cacheData) {
       res.render('tx', {
-        tx: cacheData
+        tx: JSON.parse(cacheData)
       });
     } else { // Key does not exist in Redis store
 
