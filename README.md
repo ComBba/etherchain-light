@@ -78,6 +78,7 @@ Supported Ethereum backend nodes: Parity (Geth is currently not supported as it 
 8. Start the explorer: `npm start`
 9. Browse to `http://localhost:3000`
 ###### How to use "Forever": `forever start ./bin/www`
+###### no log start : `forever start -a -l /dev/null ./bin/www`
 
 #### crontab -e for geoIP update
 ```sh
