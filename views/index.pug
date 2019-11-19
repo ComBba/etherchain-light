@@ -62,44 +62,6 @@ block content
               div#chart_BlockTime(style="min-width: 480px; max-width: 1200px; height: 400px; margin: 0 auto")
       #exchange.tab-pane.fade(role='tabpanel')
         h3 Exchange Summary
-        if bimax || bimax.nowPrice
-          table.table
-            tr
-              td(colspan="4")
-                h4 BIMAX #{moment.unix(bimax.time).format()}
-            tr
-              td(style="padding-right:20px; border-top-style: none;") 
-                center
-                  span(style="font-size:2em; color:#008cba")
-                    i.fa.fa-krw
-                  span(style="font-size:2em; color:#000000") &nbsp;&nbsp;#{numberformatter(bimax.nowPrice)}
-                  span(style="font-size:1.5em; color:#008cba")
-                    br/
-                    strong ESN to KRW
-              td(style="padding-right:20px; border-top-style: none;") 
-                center
-                  span(style="font-size:2em; color:#008cba")
-                    i.fa.fa-arrow-down
-                  span(style="font-size:2em; color:#000000") &nbsp;&nbsp;#{numberformatter(bimax.low)} KRW
-                  span(style="font-size:1.5em; color:#008cba")
-                    br/
-                    strong Lowest Price
-              td(style="padding-right:20px; border-top-style: none;") 
-                center
-                  span(style="font-size:2em; color:#008cba")
-                    i.fa.fa-arrow-up
-                  span(style="font-size:2em; color:#000000") &nbsp;&nbsp;#{numberformatter(bimax.high)} KRW
-                  span(style="font-size:1.5em; color:#008cba")
-                    br/
-                    strong Highest Price
-              td(style="border-top-style: none;") 
-                center
-                  span(style="font-size:2em; color:#008cba")
-                    i.fa.fa-globe
-                  span(style="font-size:2em; color:#000000") &nbsp;&nbsp;#{numberformatter(bimax.tradeAmount)} ESN
-                  span(style="font-size:1.5em; color:#008cba")
-                    br/
-                    strong Volume(24h)
         if coinrate.krw
           table.table
             tr

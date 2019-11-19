@@ -22,8 +22,6 @@ router.get('/', function (req, res, next) {
   data.ticker = {};
   data.coinrate = {};
 
-  data.bimax = {};
-  data.bimax.timeoutTicker = false;
 
   Object.size = function (obj) {
     var size = 0,
@@ -36,14 +34,7 @@ router.get('/', function (req, res, next) {
 
   async.waterfall([
       function (callback) {
-        redis.hgetall('bimax:'.concat('price'), function (err, result) {
-          return callback(err, result);
-        });
-      },
-      function (bimax, callback) {
-        if (bimax && Object.size(bimax) > 0) {
-          data.bimax = bimax;
-        }
+
         redis.hgetall('bitz:'.concat('ticker'), function (err, result) {
           return callback(err, result);
         });
@@ -216,7 +207,6 @@ router.get('/', function (req, res, next) {
         blockCount: data.blockCount,
         chartDataNumbers: data.chartDataNumbers,
         ticker: data.ticker,
-        bimax: data.bimax,
         coinrate: data.coinrate,
         jsload_defer: configConstant.jsload_defer,
         jsload_async: configConstant.jsload_async

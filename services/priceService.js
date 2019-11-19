@@ -1,5 +1,6 @@
 const async = require('async');
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const configConstant = require('../config/configConstant');
 var BigNumber = require('bignumber.js');
 var getJSON = require('get-json');
@@ -13,82 +14,6 @@ var prices = function () {
 			console.log("[▷▷▷ Start ▷▷▷][PricesService]", printDateTime());
 			var data = {};
 			async.waterfall([
-				//bimax 시작
-				function (callback) {
-					redis.hgetall('bimax:'.concat('price'), function (err, result) {
-						return callback(err, result);
-					});
-				},
-				function (ticker, callback) {
-					if (ticker && Object.size(ticker) > 0) {
-						data.bimax = ticker;
-					}
-					var now = new Date();
-					if (!ticker || Object.size(ticker) < 1 || (ticker && ticker.time * 1000 < now - (1000 * 60))) {
-						data.bimax.timeoutTicker = true;
-
-						var headers = {
-							'authority': 'api2.bimax.io',
-							'Origin': 'https://www.bimax.io',
-							//'Accept-Encoding': 'gzip, deflate, br',
-							//'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-							'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36',
-							//'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-							//'Accept': 'application/json, text/javascript, */*; q=0.01',
-							'Referer': 'https://www.bimax.io/trade?pairName=ESN/KRW',
-						};
-
-						var formData = {
-							pairName: 'BTC/KRW'
-						};
-
-						var options = {
-							url: 'https://api2.bimax.io/ticker/publicSignV2',
-							method: 'POST',
-							headers: headers,
-							form: formData
-						};
-
-						request.post(options, function (error, response, body) {
-							//console.log("error:", error);
-							//console.log("body:", body);
-							//console.log("response:", response);
-							return callback(error, body);
-						});
-					} else {
-						return callback(null, null);
-					}
-				},
-				function (bodyText, callback) {
-					if (bodyText) {
-						if (bodyText.toString().includes('<html>')) {
-							console.log("[Warning] BIMAX sent an incorrect response.");
-							return callback(null);
-						} else if (data.bimax.timeoutTicker) {
-							var ticker = JSON.parse(bodyText.trim());
-							var tickerall = ticker.data;
-							for (var key in tickerall) {
-								if (tickerall.hasOwnProperty(key)) {
-									if (key == "ESN/KRW") {
-										data.bimax.nowPrice = tickerall[key].nowPrice;
-										data.bimax.high = tickerall[key].high;
-										data.bimax.low = tickerall[key].low;
-										data.bimax.tradeAmount = tickerall[key].tradeAmount;
-									}
-								}
-							}
-							var now = new Date();
-							data.bimax.time = now.getTime() / 1000;
-							redis.hmset('bimax:'.concat('price'), data.bimax);
-						} else {
-							//console.log("[Notice] BIMAX cache time left.");
-						}
-					} else {
-						console.log("[Warning] 'bodyText' returned by BIMAX was null.");
-					}
-					return callback(null);
-				},
-				//bimax 종료
 				function (callback) {
 					redis.hgetall('bitz:'.concat('ticker'), function (err, result) {
 						return callback(err, result);

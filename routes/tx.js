@@ -21,13 +21,18 @@ var toUtf8 = function (hex) {
   if (hex.substring(0, 2) === '0x') {
     i = 2;
   }
+
+  //console.log("[hex]", hex);
   for (; i < l; i += 2) {
     var code = parseInt(hex.substr(i, 2), 16);
-    if (code === 0)
-      break;
+    //console.log("[code]", code);
+    if (code === 0) {
+      return "Invalid UTF-8 detected";
+    }
     str += String.fromCharCode(code);
   }
 
+  //console.log("[str]", str);
   return utf8.decode(str);
 };
 
