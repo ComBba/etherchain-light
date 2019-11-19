@@ -845,7 +845,8 @@ router.get('/:account/:offset?/:count?/:json?', function (req, res, next) {
 });
 
 function address2name(address) {
-    return configNames.names[address] ? ((configNames.names[address]).split("/"))[0] : configNames.holdnames[address] ? (('Long-term holding: '.concat(configNames.holdnames[address])).split("/"))[0] : address.substr(0, 20).concat('...');
+    var name = configNames.names[address] ? ((configNames.names[address]).split("/"))[0] : configNames.holdnames[address] ? (('Long-term holding: '.concat(configNames.holdnames[address])).split("/"))[0] : address.substr(0, 20).concat('...');
+    return name;
 }
 
 function address2href(address) {
