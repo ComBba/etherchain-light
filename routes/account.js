@@ -95,7 +95,7 @@ router.all('/transactions/:account/:query/:page?/:length?', function (req, res, 
                                 txInfo[3] = "Mining";
                             }
                             txInfo[4] = "New Coins Mining Reward";
-                            txInfo[5] = req.params.query == 'json' || req.params.account == txInfoArray[14] ? txInfoArray[14] : address2href(txInfoArray[14]);
+                            txInfo[5] = req.params.query == 'json' ? txInfoArray[14] : (req.params.account == txInfoArray[14] ? address2name(txInfoArray[14]) : address2href(txInfoArray[14]));
 
                             let Ether = new BigNumber(10e+17);
                             let ret = new BigNumber(txInfoArray[7]);
@@ -106,13 +106,13 @@ router.all('/transactions/:account/:query/:page?/:length?', function (req, res, 
                             txInfo[1] = txInfoArray[1];
                             txInfo[2] = printDateTime(parseInt(txInfoArray[2], 16) * 1000);
                             txInfo[3] = txInfoArray[3];
-                            txInfo[4] = req.params.query == 'json' || req.params.account == txInfoArray[4]  ? txInfoArray[4] : address2href(txInfoArray[4]);
+                            txInfo[4] = req.params.query == 'json' ? txInfoArray[4] : (req.params.account == txInfoArray[4] ? address2name(txInfoArray[4]) : address2href(txInfoArray[4]));
 
                             var address5 = txInfoArray[5];
                             if (txInfoArray[12] != '') {
                                 address5 = txInfoArray[12];
                             }
-                            txInfo[5] = req.params.query == 'json' || req.params.account == address5  ? address5 : address2href(address5);
+                            txInfo[5] = req.params.query == 'json' ? address5 : (req.params.account == address5 ? address2name(address5) : address2href(address5));
 
                             if (txInfoArray[11] != '') {
                                 //console.log('[9]', txInfoArray[9], '[10]', txInfoArray[10], '[11]', txInfoArray[11]);
@@ -844,9 +844,12 @@ router.get('/:account/:offset?/:count?/:json?', function (req, res, next) {
         });
 });
 
+function address2name(address) {
+    return configNames.names[address] ? ((configNames.names[address]).split("/"))[0] : configNames.holdnames[address] ? (('Long-term holding: '.concat(configNames.holdnames[address])).split("/"))[0] : address.substr(0, 20).concat('...');
+}
+
 function address2href(address) {
-    var name = configNames.names[address] ? ((configNames.names[address]).split("/"))[0] : configNames.holdnames[address] ? (('Long-term holding: '.concat(configNames.holdnames[address])).split("/"))[0] : address.substr(0, 20).concat('...');
-    return '<a href="/account/'.concat(address).concat('">').concat(name).concat('</a>');
+    return '<a href="/account/'.concat(address).concat('">').concat(address2name(address)).concat('</a>');
 }
 
 function resultToJson(err, param) {
