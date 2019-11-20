@@ -110,37 +110,20 @@ router.get('/:block', function (req, res, next) {
             var tokenEvents = [];
             async.eachSeries(accountList, function (account, accountListeachCallback) {
               //TokenDB Start
-              async.waterfall([
-                function (tokenlistcallback) {
-                  var allEvents = tokenExporter[account].contract.allEvents({
-                    fromBlock: block.number,
-                    toBlock: block.number
-                  });
-                  allEvents.get(function (err, events) {
-                    if (err) {
-                      console.log("Error receiving historical events:", err);
-                      tokenlistcallback(err, null);
-                    } else {
-                      tokenlistcallback(null, events);
-                    }
-                  });
-                }
-              ], function (err, events) {
-                if (err) {
-                  console.log("Error ", err);
-                } else {
-                  async.eachSeries(events, function (event, eventsEachCallback) {
-                    tokenEvents.push(event);
-                    eventsEachCallback();
-                  });
-                }
+              var allEvents = tokenExporter[account].contract.allEvents({
+                fromBlock: block.number,
+                toBlock: block.number
+              });
+              allEvents.get(function (err, events) {
+                async.eachSeries(events, function (event, eventsEachCallback) {
+                  tokenEvents.push(event);
+                  eventsEachCallback();
+                });
                 accountListeachCallback();
               });
-              //TokenDB End
-            }, function (err) {
-              console.log("[BlockInfo][005]\ttokenlistcallback\t", new Date().toLocaleString());
-              callback(err, tokenEvents, block, traces);
             });
+            console.log("[BlockInfo][005]\ttokenExporter\t", new Date().toLocaleString());
+            //TokenDB End
           } else {
             console.log("[BlockInfo][005]\tno contract\t", new Date().toLocaleString());
             callback(null, null, block, traces);
