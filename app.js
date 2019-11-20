@@ -86,6 +86,7 @@ async.waterfall([
         if (!result) {
           result = 1;
         }
+        console.log("[tokenCreateBlock]\t", result);
         var now = new Date();
         tokenExporter[account] = new tokenExporterService(config.providerIpc, configERC20.erc20ABI, account, result, now.getTime());
         waitUntil()
