@@ -110,35 +110,19 @@ router.get('/:block', function (req, res, next) {
             var tokenEvents = [];
             async.eachSeries(accountList, function (account, accountListeachCallback) {
               //TokenDB Start
-              async.waterfall([
-                function (tokenlistcallback) {
-                  var allEvents = tokenExporter[account].contract.allEvents({
-                    fromBlock: block.number,
-                    toBlock: block.number
-                  });
-                  allEvents.get(function (err, events) {
-                    if (err) {
-                      console.log("Error receiving historical events:", err);
-                      tokenlistcallback(err, null);
-                    } else {
-                      tokenlistcallback(null, events);
-                    }
-                  });
-                }
-              ], function (err, events) {
+              tokenExporter[account].contract.allEvents({
+                fromBlock: block.number,
+                toBlock: block.number
+              }).get(function (err, events) {
                 if (err) {
-                  console.log("Error ", err);
-                } else {
-                  async.eachSeries(events, function (event, eventsEachCallback) {
-                    tokenEvents.push(event);
-                    eventsEachCallback();
-                  });
+                  console.log("Error receiving historical events: ", err);
+                } else if (events.length >= 1) {
+                  tokenEvents.push(events);
                 }
                 accountListeachCallback();
               });
-              //TokenDB End
             }, function (err) {
-              console.log("[BlockInfo][005]\ttokenlistcallback\t", new Date().toLocaleString());
+              console.log("[BlockInfo][005]\taccountListeachCallback\t", new Date().toLocaleString());
               callback(err, tokenEvents, block, traces);
             });
           } else {

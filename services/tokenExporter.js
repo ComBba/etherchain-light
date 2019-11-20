@@ -49,6 +49,7 @@ var exporter = function (provider, erc20ABI, tokenAddress, createBlock, startTim
   self.web3.setProvider(provider);
 
   self.contract = self.web3.eth.contract(erc20ABI).at(tokenAddress);
+
   //console.log("[Token Init]", tokenAddress);
   self.allEvents = self.contract.allEvents({
     fromBlock: createBlock,
@@ -157,6 +158,9 @@ var exporter = function (provider, erc20ABI, tokenAddress, createBlock, startTim
   };
 
   self.processLog = function (log, callback) {
+    var startLogBlockNumber = 1;
+    var lastLogBlockNumber = 1;
+
     if (log.blockNumber && typeof log.blockNumber === 'string' && log.blockNumber.substr(0, 2) === '0x') {
       log.blockNumber = parseInt(log.blockNumber, 16);
     }
@@ -176,7 +180,6 @@ var exporter = function (provider, erc20ABI, tokenAddress, createBlock, startTim
 
       if (log.args && log.args._value) {
         log.args._value = log.args._value.toNumber();
-        redis.hset('ExportToken:createBlock:', tokenAddress, log.blockNumber);
       }
 
       self.db.insert(log, function (err, newLogs) {
@@ -186,8 +189,16 @@ var exporter = function (provider, erc20ABI, tokenAddress, createBlock, startTim
           } else {
             console.log("Error inserting log:", err);
           }
+        } else {
+          if(startLogBlockNumber > log.blockNumber){
+            startLogBlockNumber = log.blockNumber;
+            redis.hset('ExportToken:createBlock:', tokenAddress, log.blockNumber);
+          }
+          if(lastLogBlockNumber < log.blockNumber){
+            lastLogBlockNumber = log.blockNumber;
+            redis.hset('ExportToken:lastBlock:', tokenAddress, log.blockNumber);
+          }
         }
-
         callback();
       });
     });
