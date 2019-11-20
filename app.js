@@ -33,8 +33,8 @@ let api_info = require('./api/info');
 
 let test_batch = require('./routes/test_batch');
 
-let config = new(require('./config/config.js'))();
-let configERC20 = new(require('./config/configERC20.js'))();
+let config = new (require('./config/config.js'))();
+let configERC20 = new (require('./config/configERC20.js'))();
 let configConstant = require('./config/configConstant');
 
 let level = require('level-rocksdb');
@@ -66,11 +66,11 @@ async.waterfall([
       callback(null, replies);
     });
   },
-  function (result, callback) {
-    //console.dir(result);
+  function (contractsWithEventsLength, callback) {
+    //console.dir(contractsWithEventsLength);
     let sortable = [];
-    for (let adr in result) {
-      sortable.push([adr, result[adr]]);
+    for (let adr in contractsWithEventsLength) {
+      sortable.push([adr, contractsWithEventsLength[adr]]);
     }
     sortable.sort(function (a, b) {
       return Number(a[1]) - Number(b[1]);
@@ -82,28 +82,27 @@ async.waterfall([
       contractAccountList.push(account);
       //console.log(account,"start", Date.now());
 
-      redis.hget('ExportToken:createBlock:', account, function (err, result) {
-        if (!result) {
-          result = 1;
-        }
-        result = 1;
-        console.log("[tokenCreateBlock]\t", result);
-        var now = new Date();
-        tokenExporter[account] = new tokenExporterService(config.providerIpc, configERC20.erc20ABI, account, result, now.getTime());
-        waitUntil()
-          .interval(10)
-          .times(100)
-          .condition(function (cb) {
-            process.nextTick(function () {
-              cb(tokenExporter[account].isLoaded);
-            });
-          })
-          .done(function (result) {
-            sleep(10).then(() => {
-              forEachOfCallback();
-            });
+      /*tokenExporter system error checking...
+             redis.hget('ExportToken:createBlock:', account, function (err, createBlockNumber) {
+              if (!createBlockNumber) {
+                createBlockNumber = 1;
+              }
+              console.log("[tokenCreateBlock]\t", createBlockNumber);
+       */
+      createBlockNumber = 1;
+      var now = new Date();
+      tokenExporter[account] = new tokenExporterService(config.providerIpc, configERC20.erc20ABI, account, createBlockNumber, now.getTime());
+      waitUntil()
+        .interval(10)
+        .times(100)
+        .condition(function (cb) {
+          process.nextTick(function () {
+            cb(tokenExporter[account].isLoaded);
           });
-      });
+        })
+        .done(function (result) {
+            forEachOfCallback();
+        });
     }, function (err) {
       if (err) {
         console.log("[ERROR] exporter listing: ", err);
@@ -166,13 +165,13 @@ async.waterfall([
   app.use(cookieParser());
   app.use(express.static(path.join(__dirname, 'public')));
 
-  app.locals.tokenformatter = new(require('./utils/tokenformatter.js'))();
+  app.locals.tokenformatter = new (require('./utils/tokenformatter.js'))();
   app.locals.moment = require('moment');
   app.locals.numeral = require('numeral');
   app.locals.ethformatter = require('./utils/ethformatter.js');
   app.locals.numberformatter = require('./utils/numberformatter.js');
-  app.locals.nameformatter = new(require('./utils/nameformatter.js'))();
-  app.locals.nodeStatus = new(require('./utils/nodeStatus.js'))(config);
+  app.locals.nameformatter = new (require('./utils/nameformatter.js'))();
+  app.locals.nodeStatus = new (require('./utils/nodeStatus.js'))(config);
   app.locals.config = config;
   app.locals.configERC20 = configERC20;
   app.use('/', index);
