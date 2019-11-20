@@ -62,6 +62,7 @@ router.get('/:block', function (req, res, next) {
       async.waterfall([
         function (callback) {
           web3.eth.getBlock(req.params.block, true, function (err, result) {
+            console.log("[BlockInfo][001]\tweb3.eth.getBlock\t", new Date().toLocaleString());
             callback(err, result);
           });
         },
@@ -73,11 +74,13 @@ router.get('/:block', function (req, res, next) {
             }, null, null);
           }
           web3.trace.block(result.number, function (err, traces) {
+            console.log("[BlockInfo][002]\tweb3.trace.block\t", new Date().toLocaleString());
             callback(err, result, traces);
           });
         },
         function (block, traces, callback) {
           redis.hgetall('esn_contracts:transfercount', function (err, replies) {
+            console.log("[BlockInfo][003]\tredis.hgetall\t", new Date().toLocaleString());
             callback(null, block, traces, replies);
           });
 
@@ -94,9 +97,11 @@ router.get('/:block', function (req, res, next) {
               if (err) {
                 console.log("[ERROR]block: ", err);
               }
+              console.log("[BlockInfo][004]\taccountList.push\t", new Date().toLocaleString());
               callback(null, block, traces, accountList);
             });
           } else {
+            console.log("[BlockInfo][004]\tno contract\t", new Date().toLocaleString());
             callback(null, block, traces, null);
           }
         },
@@ -133,9 +138,11 @@ router.get('/:block', function (req, res, next) {
               });
               //TokenDB End
             }, function (err) {
+              console.log("[BlockInfo][005]\ttokenlistcallback\t", new Date().toLocaleString());
               callback(err, tokenEvents, block, traces);
             });
           } else {
+            console.log("[BlockInfo][005]\tno contract\t", new Date().toLocaleString());
             callback(null, null, block, traces);
           }
         }
@@ -146,6 +153,7 @@ router.get('/:block', function (req, res, next) {
         }
 
         if (block && block.transactions) {
+          console.log("[BlockInfo][006]\tblock.transactions.forEach\t", new Date().toLocaleString());
           block.transactions.forEach(function (tx) {
             tx.traces = [];
             tx.failed = false;
@@ -181,6 +189,7 @@ router.get('/:block', function (req, res, next) {
           });
         }
         if (block && block.extraData) {
+          console.log("[BlockInfo][007]\tblock.extraDataToAscii\t", new Date().toLocaleString());
           block.extraDataToAscii = hex2ascii(block.extraData);
         }
 
@@ -191,6 +200,7 @@ router.get('/:block', function (req, res, next) {
           });
         } else {
           //console.dir(block);
+          console.log("[BlockInfo][008]\tres.render\t", new Date().toLocaleString());
           redis.set(cacheRedisKey.concat(block.number), JSON.stringify(block))
           redis.set(cacheRedisKey.concat(block.hash), JSON.stringify(block))
           res.render('block', {
