@@ -33,8 +33,8 @@ let api_info = require('./api/info');
 
 let test_batch = require('./routes/test_batch');
 
-let config = new(require('./config/config.js'))();
-let configERC20 = new(require('./config/configERC20.js'))();
+let config = new (require('./config/config.js'))();
+let configERC20 = new (require('./config/configERC20.js'))();
 let configConstant = require('./config/configConstant');
 
 let level = require('level-rocksdb');
@@ -88,19 +88,9 @@ async.waterfall([
         }
         var now = new Date();
         tokenExporter[account] = new tokenExporterService(config.providerIpc, configERC20.erc20ABI, account, result, now.getTime());
-        waitUntil()
-          .interval(10)
-          .times(100)
-          .condition(function (cb) {
-            process.nextTick(function () {
-              cb(tokenExporter[account].isLoaded);
-            });
-          })
-          .done(function (result) {
-            sleep(10).then(() => {
-              forEachOfCallback();
-            });
-          });
+        async.setImmediate(function () {
+          forEachOfCallback();
+        });
       });
     }, function (err) {
       if (err) {
@@ -164,13 +154,13 @@ async.waterfall([
   app.use(cookieParser());
   app.use(express.static(path.join(__dirname, 'public')));
 
-  app.locals.tokenformatter = new(require('./utils/tokenformatter.js'))();
+  app.locals.tokenformatter = new (require('./utils/tokenformatter.js'))();
   app.locals.moment = require('moment');
   app.locals.numeral = require('numeral');
   app.locals.ethformatter = require('./utils/ethformatter.js');
   app.locals.numberformatter = require('./utils/numberformatter.js');
-  app.locals.nameformatter = new(require('./utils/nameformatter.js'))();
-  app.locals.nodeStatus = new(require('./utils/nodeStatus.js'))(config);
+  app.locals.nameformatter = new (require('./utils/nameformatter.js'))();
+  app.locals.nodeStatus = new (require('./utils/nodeStatus.js'))(config);
   app.locals.config = config;
   app.locals.configERC20 = configERC20;
   app.use('/', index);
