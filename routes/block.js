@@ -79,36 +79,37 @@ router.get('/:block', function (req, res, next) {
           });
         },
         function (block, traces, callback) {
-          redis.hgetall('esn_contracts:transfercount', function (err, replies) {
+          //redis.hset('ExportToken:tokenByBlockNumber', log.blockNumber, tokenAddress);
+          redis.hgetall('ExportToken:tokenByBlockNumber', function (err, replies) {
             console.log("[BlockInfo][003]\tredis.hgetall\t", new Date().toLocaleString());
             callback(null, block, traces, replies);
           });
 
         },
-        function (block, traces, result, callback) {
-          var accountList = [];
-          if (result) {
-            async.eachOfSeries(result, function (value, key, eachOfSeriesCallback) {
-              if (value > 0) {
-                accountList.push(key);
+        function (block, traces, tokenByBlockNumber, callback) {
+          var tokenList = [];
+          if (tokenByBlockNumber) {
+            async.eachOfSeries(tokenByBlockNumber, function (value, key, eachOfSeriesCallback) {
+              if (key == block.number) {
+                tokenList.push(value);
               }
               eachOfSeriesCallback();
             }, function (err) {
               if (err) {
                 console.log("[ERROR]block: ", err);
               }
-              console.log("[BlockInfo][004]\taccountList.push\t", new Date().toLocaleString());
-              callback(null, block, traces, accountList);
+              console.log("[BlockInfo][004]\ttokenList.push\t", new Date().toLocaleString());
+              callback(null, block, traces, tokenList);
             });
           } else {
             console.log("[BlockInfo][004]\tno contract\t", new Date().toLocaleString());
             callback(null, block, traces, null);
           }
         },
-        function (block, traces, accountList, callback) {
-          if (accountList && accountList.length > 0) {
+        function (block, traces, tokenList, callback) {
+          if (tokenList && tokenList.length > 0) {
             var tokenEvents = [];
-            async.eachSeries(accountList, function (account, accountListeachCallback) {
+            async.eachSeries(tokenList, function (account, tokenListeachCallback) {
               //TokenDB Start
               tokenExporter[account].contract.allEvents({
                 fromBlock: block.number,
@@ -119,10 +120,10 @@ router.get('/:block', function (req, res, next) {
                 } else if (events.length >= 1) {
                   tokenEvents.push(events);
                 }
-                accountListeachCallback();
+                tokenListteachCallback();
               });
             }, function (err) {
-              console.log("[BlockInfo][005]\taccountListeachCallback\t", new Date().toLocaleString());
+              console.log("[BlockInfo][005]\ttokenListeachCallback\t", new Date().toLocaleString());
               callback(err, tokenEvents, block, traces);
             });
           } else {

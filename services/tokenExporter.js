@@ -190,13 +190,14 @@ var exporter = function (provider, erc20ABI, tokenAddress, createBlock, startTim
             console.log("Error inserting log:", err);
           }
         } else {
+          redis.hset('ExportToken:tokenByBlockNumber', log.blockNumber, tokenAddress);
           if(startLogBlockNumber > log.blockNumber){
             startLogBlockNumber = log.blockNumber;
-            redis.hset('ExportToken:createBlock:', tokenAddress, log.blockNumber);
+            //redis.hset('ExportToken:createBlock:', tokenAddress, log.blockNumber);
           }
           if(lastLogBlockNumber < log.blockNumber){
             lastLogBlockNumber = log.blockNumber;
-            redis.hset('ExportToken:lastBlock:', tokenAddress, log.blockNumber);
+            //redis.hset('ExportToken:lastBlock:', tokenAddress, log.blockNumber);
           }
         }
         callback();
