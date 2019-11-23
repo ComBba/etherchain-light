@@ -113,6 +113,7 @@ router.get('/:end?', function (req, res, next) {
     var countBlockTimes = 0;
     var totaDifficulty = 0;
     data.txnumber = 0;
+    data.unclesnumber = 0;
     data.dbBlock = 0;
     var maxBlockNumber = 0;
 
@@ -128,9 +129,11 @@ router.get('/:end?', function (req, res, next) {
 
         if (data.dbLastBlock > block.number) {
           data.txnumber += Number(block.transactions);
+          data.unclesnumber += Number(block.uncles);
           data.dbBlock++;
         } else {
           data.txnumber += block.transactions ? block.transactions.length : 0;
+          data.unclesnumber += block.uncles ? block.uncles.length : 0;
         }
       }
     });
@@ -166,6 +169,7 @@ router.get('/:end?', function (req, res, next) {
       endTime: data.endTime,
       consumptionTime: data.consumptionTime,
       transactionsCount: data.txnumber.toLocaleString(),
+      unclesCount: data.unclesnumber.toLocaleString(),
       FoundBlockInDB: data.dbBlock.toLocaleString(),
       LastBlockInDB: data.dbLastBlock.toLocaleString(),
       nowBlockNumber: blocks[0] === undefined ? 0 : blocks[0].number

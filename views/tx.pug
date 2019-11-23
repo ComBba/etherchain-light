@@ -106,11 +106,11 @@ block content
     tr
       td Input(UTF-8):
       td
-        textarea.form-control(rows="5") #{tx.inputToUtf8}
+        textarea.form-control(rows="5", readonly) #{tx.inputToUtf8}
     tr
       td Input(raw):
       td
-        textarea.form-control(rows="5") #{tx.input}
+        textarea.form-control(rows="5", readonly) #{tx.input}
     
   a(href="/tx/raw/" + tx.hash) Raw Trace
   h4 Internal Transactions

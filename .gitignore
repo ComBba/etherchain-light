@@ -59,8 +59,11 @@ typings/
 
 # Data directory
 data/
+tokenDatastore/
 .vs/
 
 # Configuration file
 #config.js
 *.bak
+/initRedis.sh
+/package-lock.json

@@ -14,7 +14,8 @@ var accountblanceschecker = function (config, configERC20, app) {
 		function (next) {
 			console.log("[▷▷▷ Start ▷▷▷][accountBalanceService]", printDateTime());
 			var web3 = new Web3();
-			web3.setProvider(new web3.providers.HttpProvider(configConstant.localRPCaddress));
+			web3.setProvider(config.selectParity());
+
 			var Ether = new BigNumber(10e+17);
 			var data = "";
 			var cnt = 0;
@@ -208,36 +209,36 @@ var accountblanceschecker = function (config, configERC20, app) {
 						var redis_args = [finalRdsKey, max, min, 'WITHSCORES'];
 
 						async.waterfall([
-								function (apicallback) {
-									redis.hget(finalRdsKey.concat(':lastaccount'), 'count', function (err, result) {
-										return apicallback(err, result);
-									});
-								},
-								function (allcnt, apicallback) {
-									redis.zrevrange(redis_args, function (err, result) {
-										return apicallback(err, allcnt, result);
-									});
-								},
-								function (allcnt, accounts, apicallback) {
-									var isAccount = true;
+							function (apicallback) {
+								redis.hget(finalRdsKey.concat(':lastaccount'), 'count', function (err, result) {
+									return apicallback(err, result);
+								});
+							},
+							function (allcnt, apicallback) {
+								redis.zrevrange(redis_args, function (err, result) {
+									return apicallback(err, allcnt, result);
+								});
+							},
+							function (allcnt, accounts, apicallback) {
+								var isAccount = true;
 
-									async.eachSeries(accounts, function (account, apieachCallback) {
-										async.setImmediate(function () {
-											if (isAccount) {
-												totalAccounts = totalAccounts.plus(1);
-												isAccount = false;
-											} else {
-												let ret = new BigNumber(account);
-												totalSupply = totalSupply.plus(ret);
-												isAccount = true;
-											}
-											apieachCallback();
-										});
-									}, function (err) {
-										apicallback(err, allcnt, totalAccounts.toNumber(), totalSupply.toNumber());
+								async.eachSeries(accounts, function (account, apieachCallback) {
+									async.setImmediate(function () {
+										if (isAccount) {
+											totalAccounts = totalAccounts.plus(1);
+											isAccount = false;
+										} else {
+											let ret = new BigNumber(account);
+											totalSupply = totalSupply.plus(ret);
+											isAccount = true;
+										}
+										apieachCallback();
 									});
-								}
-							],
+								}, function (err) {
+									apicallback(err, allcnt, totalAccounts.toNumber(), totalSupply.toNumber());
+								});
+							}
+						],
 							function (err, totalAccounts, activeAccounts, totalSupply) {
 								if (err) {
 									console.log('!!!! accountBalanceService Error !!!!', err);

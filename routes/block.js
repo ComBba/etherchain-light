@@ -9,6 +9,7 @@ var Redis = require('ioredis');
 var redis = new Redis(configConstant.redisConnectString);
 
 var RLP = require('rlp');
+const cacheRedisKey = 'explorerBlocks:cache:';
 
 /* modified baToJSON() routine from rlp */
 function baToString(ba) {
@@ -45,150 +46,155 @@ var hex2ascii = function (hexIn) {
 };
 
 router.get('/:block', function (req, res, next) {
-  var config = req.app.get('config');
-  var web3 = new Web3();
-  web3.setProvider(config.selectParity());
-
-  var tokenExporter = req.app.get('tokenExporter');
-
-  async.waterfall([
-    function (callback) {
-      web3.eth.getBlock(req.params.block, true, function (err, result) {
-        callback(err, result);
+  return redis.get(cacheRedisKey.concat(req.params.block), (err, cacheBlock) => {
+    // If that key exists in Redis store
+    if (cacheBlock) {
+      res.render('block', {
+        block: JSON.parse(cacheBlock)
       });
-    },
-    function (result, callback) {
-      if (!result) {
-        return callback({
-          name: "BlockNotFoundError",
-          message: "Block not found!"
-        }, null, null);
-      }
-      web3.trace.block(result.number, function (err, traces) {
-        callback(err, result, traces);
-      });
-    },
-    function (block, traces, callback) {
-      redis.hgetall('esn_contracts:transfercount', function (err, replies) {
-        callback(null, block, traces, replies);
-      });
+    } else { // Key does not exist in Redis store
+      var config = req.app.get('config');
+      var web3 = new Web3();
+      web3.setProvider(config.selectParity());
 
-    },
-    function (block, traces, result, callback) {
-      var accountList = [];
-      if (result) {
-        async.eachOfSeries(result, function (value, key, eachOfSeriesCallback) {
-          if (value > 0) {
-            accountList.push(key);
+      var tokenExporter = req.app.get('tokenExporter');
+
+      async.waterfall([
+        function (callback) {
+          web3.eth.getBlock(req.params.block, true, function (err, result) {
+            //console.log("[BlockInfo][001]\tweb3.eth.getBlock\t", new Date().toLocaleString());
+            callback(err, result);
+          });
+        },
+        function (result, callback) {
+          if (!result) {
+            return callback({
+              name: "BlockNotFoundError",
+              message: "Block not found!"
+            }, null, null);
           }
-          eachOfSeriesCallback();
-        }, function (err) {
-          if (err) {
-            console.log("[ERROR]block: ", err);
+          web3.trace.block(result.number, function (err, traces) {
+            //console.log("[BlockInfo][002]\tweb3.trace.block\t", new Date().toLocaleString());
+            callback(err, result, traces);
+          });
+        },
+        function (block, traces, callback) {
+          //redis.hset('ExportToken:tokenByBlockNumber', log.blockNumber, tokenAddress);
+          redis.hgetall('ExportToken:tokenByBlockNumber', function (err, replies) {
+            //console.log("[BlockInfo][003]\tredis.hgetall\t", new Date().toLocaleString());
+            callback(null, block, traces, replies);
+          });
+
+        },
+        function (block, traces, tokenByBlockNumber, callback) {
+          var tokenList = [];
+          if (tokenByBlockNumber) {
+            async.eachOfSeries(tokenByBlockNumber, function (value, key, eachOfSeriesCallback) {
+              if (key == block.number) {
+                tokenList.push(value);
+              }
+              eachOfSeriesCallback();
+            }, function (err) {
+              if (err) {
+                console.log("[ERROR]block: ", err);
+              }
+              //console.log("[BlockInfo][004]\ttokenList.push\t", new Date().toLocaleString());
+              callback(null, block, traces, tokenList);
+            });
+          } else {
+            //console.log("[BlockInfo][004]\tno contract\t", new Date().toLocaleString());
+            callback(null, block, traces, null);
           }
-          callback(null, block, traces, accountList);
-        });
-      } else {
-        callback(null, block, traces, null);
-      }
-    },
-    function (block, traces, accountList, callback) {
-      if (accountList && accountList.length > 0) {
-        var tokenEvents = [];
-        async.eachSeries(accountList, function (account, accountListeachCallback) {
-          //TokenDB Start
-          async.waterfall([
-            function (tokenlistcallback) {
-              var allEvents = tokenExporter[account].contract.allEvents({
+        },
+        function (block, traces, tokenList, callback) {
+          if (tokenList && tokenList.length > 0) {
+            var tokenEvents = [];
+            async.eachSeries(tokenList, function (account, tokenListeachCallback) {
+              //TokenDB Start
+              tokenExporter[account].contract.allEvents({
                 fromBlock: block.number,
                 toBlock: block.number
-              });
-              allEvents.get(function (err, events) {
+              }).get(function (err, events) {
                 if (err) {
-                  console.log("Error receiving historical events:", err);
-                  tokenlistcallback(err, null);
-                } else {
-                  tokenlistcallback(null, events);
+                  console.log("Error receiving historical events: ", err);
+                } else if (events.length >= 1) {
+                  tokenEvents.push(events);
+                }
+                tokenListteachCallback();
+              });
+            }, function (err) {
+              //console.log("[BlockInfo][005]\ttokenListeachCallback\t", new Date().toLocaleString());
+              callback(err, tokenEvents, block, traces);
+            });
+          } else {
+            //console.log("[BlockInfo][005]\tno contract\t", new Date().toLocaleString());
+            callback(null, null, block, traces);
+          }
+        }
+      ], function (err, tokenEvents, block, traces) {
+        if (err) {
+          console.log("Error ", err);
+          return next(err);
+        }
+
+        if (block && block.transactions) {
+          //console.log("[BlockInfo][006]\tblock.transactions.forEach\t", new Date().toLocaleString());
+          block.transactions.forEach(function (tx) {
+            tx.traces = [];
+            tx.failed = false;
+            if (traces != null) {
+              traces.forEach(function (trace) {
+                if (tx.hash === trace.transactionHash) {
+                  if (tokenEvents) {
+                    tokenEvents.forEach(function (event) {
+                      if (trace.transactionHash === event.transactionHash) {
+                        if (event.event === "Transfer" || event.event === "Approval") {
+                          if (event.args && event.args._value && trace.transactionPosition == event.transactionIndex) {
+                            trace._value = "0x".concat(event.args._value.toNumber().toString(16));
+                            trace._from = event.args._from;
+                            trace._to = event.args._to;
+                            trace._event = event.event;
+                            trace._decimals = tokenExporter[trace.action.to] ? (tokenExporter[trace.action.to].token_decimals ? tokenExporter[trace.action.to].token_decimals : 0) : 0;
+                            trace._symbol = tokenExporter[trace.action.to] ? (tokenExporter[trace.action.to].token_symbol ? tokenExporter[trace.action.to].token_symbol : 'n/a') : 'n/a';
+                            trace._name = tokenExporter[trace.action.to] ? (tokenExporter[trace.action.to].token_name ? tokenExporter[trace.action.to].token_name : '') : '';
+                            trace.isinTransfer = true;
+                          }
+                        }
+                      }
+                    });
+                  }
+                  tx.traces.push(trace);
+                  if (trace.error) {
+                    tx.failed = true;
+                    tx.error = trace.error;
+                  }
                 }
               });
             }
-          ], function (err, events) {
-            if (err) {
-              console.log("Error ", err);
-            } else {
-              async.eachSeries(events, function (event, eventsEachCallback) {
-                tokenEvents.push(event);
-                eventsEachCallback();
-              });
-            }
-            accountListeachCallback();
           });
-          //TokenDB End
-        }, function (err) {
-          callback(err, tokenEvents, block, traces);
-        });
-      } else {
-        callback(null, null, block, traces);
-      }
-    }
-  ], function (err, tokenEvents, block, traces) {
-    if (err) {
-      console.log("Error ", err);
-      return next(err);
-    }
+        }
+        if (block && block.extraData) {
+          //console.log("[BlockInfo][007]\tblock.extraDataToAscii\t", new Date().toLocaleString());
+          block.extraDataToAscii = hex2ascii(block.extraData);
+        }
 
-    if (block && block.transactions) {
-      block.transactions.forEach(function (tx) {
-        tx.traces = [];
-        tx.failed = false;
-        if (traces != null) {
-          traces.forEach(function (trace) {
-            if (tx.hash === trace.transactionHash) {
-              if (tokenEvents) {
-                tokenEvents.forEach(function (event) {
-                  if (trace.transactionHash === event.transactionHash) {
-                    if (event.event === "Transfer" || event.event === "Approval") {
-                      if (event.args && event.args._value && trace.transactionPosition == event.transactionIndex) {
-                        trace._value = "0x".concat(event.args._value.toNumber().toString(16));
-                        trace._from = event.args._from;
-                        trace._to = event.args._to;
-                        trace._event = event.event;
-                        trace._decimals = tokenExporter[trace.action.to] ? (tokenExporter[trace.action.to].token_decimals ? tokenExporter[trace.action.to].token_decimals : 0) : 0;
-                        trace._symbol = tokenExporter[trace.action.to] ? (tokenExporter[trace.action.to].token_symbol ? tokenExporter[trace.action.to].token_symbol : 'n/a') : 'n/a';
-                        trace._name = tokenExporter[trace.action.to] ? (tokenExporter[trace.action.to].token_name ? tokenExporter[trace.action.to].token_name : '') : '';
-                        trace.isinTransfer = true;
-                      }
-                    }
-                  }
-                });
-              }
-              tx.traces.push(trace);
-              if (trace.error) {
-                tx.failed = true;
-                tx.error = trace.error;
-              }
-            }
+        if (!block || !block.number) {
+          return next({
+            name: "BlockNotFoundError",
+            message: "Block not found!"
+          });
+        } else {
+          //console.dir(block);
+          //console.log("[BlockInfo][008]\tres.render\t", new Date().toLocaleString());
+          redis.set(cacheRedisKey.concat(block.number), JSON.stringify(block))
+          redis.set(cacheRedisKey.concat(block.hash), JSON.stringify(block))
+          res.render('block', {
+            block: block
           });
         }
       });
     }
-    if (block && block.extraData) {
-      block.extraDataToAscii = hex2ascii(block.extraData);
-    }
-
-    if (!block || !block.number) {
-      return next({
-        name: "BlockNotFoundError",
-        message: "Block not found!"
-      });
-    } else {
-      //console.dir(block);
-      res.render('block', {
-        block: block
-      });
-    }
   });
-
 });
 
 router.get('/uncle/:hash/:number', function (req, res, next) {

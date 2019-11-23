@@ -1,11 +1,11 @@
 extends layout
 
 block content
-  link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.19/css/dataTables.bootstrap4.css')
-  script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/gojs/1.8.32/go.js')
-  script(type='text/javascript', src='/GoJS-1.8.32/extensions/HyperlinkText.js')
-  script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.19/js/jquery.dataTables.js')
-  script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.19/js/dataTables.bootstrap4.js')
+  link(rel='stylesheet', href='https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.css')
+  script(type='text/javascript', src='https://unpkg.com/gojs/release/go.js')
+  script(type='text/javascript', src='https://gojs.net/latest/extensions/HyperlinkText.js')
+  script(type='text/javascript', src='https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js')
+  script(type='text/javascript', src='https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.js')
   if account.isContract
     h3 Contract #{account.address}
   else
@@ -176,14 +176,13 @@ block content
                       td
                         a(href="/block/" + trace.blockNumber) #{trace.blockNumber}
                       if trace.action.rewardType === "uncle"
-                        td Mining Reward(Uncle)
+                        td Uncle Reward
                       else
                         td Mining Reward
                       td
                         span.glyphicon.glyphicon-gift(style="color: blue;")
                       td New Coins
-                      td 
-                        a(href="/account/" + trace.action.author) #{nameformatter.format(trace.action.author)}
+                      td #{nameformatter.format(trace.action.author)}
                       td(align="right") #{ethformatter(trace.action.value)}
                       td #{trace.isContract}
                   else if trace.type !== "reward"
@@ -195,7 +194,7 @@ block content
                       td.capitalize
                         if trace.error
                           span(style="color: red", data-toggle="tooltip", data-placement="left", title=trace.error).glyphicon.glyphicon-warning-sign
-                        |  #{trace.type}
+                        | #{trace.type}
                       if trace.type === "call"
                         td
                           if trace.calltype === "to"
@@ -205,12 +204,21 @@ block content
                           else
                             span.glyphicon.glyphicon-new-window(style="color: blue;")
                         td
-                          a(href="/account/" + trace.action.from) #{nameformatter.format(trace.action.from)}
+                          if trace.action.from === account.address
+                            |#{nameformatter.format(trace.action.from)}
+                          else 
+                            a(href="/account/" + trace.action.from) #{nameformatter.format(trace.action.from)}
                         td 
                           if trace.action._to !== ''
-                            a(href="/account/" + trace.action._to) #{nameformatter.format(trace.action._to)}
+                            if trace.action._to === account.address
+                              |#{nameformatter.format(trace.action._to)}
+                            else
+                              a(href="/account/" + trace.action._to) #{nameformatter.format(trace.action._to)}
                           else
-                            a(href="/account/" + trace.action.to) #{nameformatter.format(trace.action.to)}
+                            if trace.action.to === account.address
+                              |#{nameformatter.format(trace.action.to)}
+                            else
+                              a(href="/account/" + trace.action.to) #{nameformatter.format(trace.action.to)}
                         if trace.action._value !== ''
                           td(align="right") #{tokenformatter.format(trace.action._value, trace.token_decimals, trace.token_symbol)}
                         else
@@ -220,9 +228,15 @@ block content
                         td
                           span.glyphicon.glyphicon-asterisk(style="color: blue;")
                         td
-                          a(href="/account/" + trace.action.from) #{nameformatter.format(trace.action.from)}
+                          if trace.action.from === account.address
+                            |#{nameformatter.format(trace.action.from)}
+                          else
+                            a(href="/account/" + trace.action.from) #{nameformatter.format(trace.action.from)}
                         td
-                          a(href="/account/" + trace.result.address) #{nameformatter.format(trace.result.address)}
+                          if trace.result.address === account.address
+                            |#{nameformatter.format(trace.result.address)}
+                          else
+                            a(href="/account/" + trace.result.address) #{nameformatter.format(trace.result.address)}
                         td(align="right") #{tokenformatter.format(trace.action.value, trace.token_decimals, trace.token_symbol)}
                         td #{trace.isContract}
                       else if trace.type === "suicide"
@@ -232,9 +246,15 @@ block content
                           else
                             span.glyphicon.glyphicon-import(style="color: green;")
                         td
-                          a(href="/account/" + trace.action.address) #{nameformatter.format(trace.action.address)}
+                          if trace.action.address === account.address
+                            |#{nameformatter.format(trace.action.address)}
+                          else
+                            a(href="/account/" + trace.action.address) #{nameformatter.format(trace.action.address)}
                         td
-                          a(href="/account/" + trace.action.refundAddress) #{nameformatter.format(trace.action.refundAddress)}
+                          if trace.action.refundAddress === account.address
+                            |#{nameformatter.format(trace.action.refundAddress)}
+                          else
+                            a(href="/account/" + trace.action.refundAddress) #{nameformatter.format(trace.action.refundAddress)}
                         td(align="right") #{ethformatter(trace.action.balance)}
                         td #{trace.isContract}
         if account.tokenBlocks
@@ -271,9 +291,15 @@ block content
                         else
                           span.glyphicon.glyphicon-log-in(style="color: green;")
                       td
-                        a(href="/account/" + trace.args._from) #{nameformatter.format(trace.args._from)}
+                        if trace.args._from === account.address
+                          |#{nameformatter.format(trace.args._from)}
+                        else
+                          a(href="/account/" + trace.args._from) #{nameformatter.format(trace.args._from)}
                       td
-                        a(href="/account/" + trace.args._to) #{nameformatter.format(trace.args._to)}
+                        if trace.args._to === account.address
+                          |#{nameformatter.format(trace.args._to)}
+                        else
+                          a(href="/account/" + trace.args._to) #{nameformatter.format(trace.args._to)}
                       td(align="right") #{tokenformatter.format(trace.args._value, trace.token_decimals, trace.token_symbol)}
         if account.isContract
           //
@@ -391,7 +417,7 @@ block content
               // define the node's outer shape, which will surround the TextBlock
               $(go.Shape, "RoundedRectangle", { fill: $(go.Brush, "Linear", { 0: "#008cba", 1: "#99d2e5" }), stroke: "#008cba" }),
               $("HyperlinkText",
-                function(node) { return node.data.text=="Mining"?"http://pool.sejun.info/":"http://!{hostname}/account/" + node.data.text; },
+                function(node) { return (node.data.text=="Mining"?"http://pool.esn.today/":"http://!{hostname}/account/").concat(node.data.text); },
                 function(node) { return node.data.text.substr(0, 10).concat("..."); },
                 { font: "bold 10pt helvetica, bold arial, sans-serif", stroke: "white", margin: 4 }
               )
