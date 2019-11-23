@@ -59,6 +59,7 @@ typings/
 
 # Data directory
 data/
+.vs/
 
 # Configuration file
 #config.js
