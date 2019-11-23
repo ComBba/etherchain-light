@@ -80,33 +80,14 @@ router.get('/:block', function (req, res, next) {
         },
         function (block, traces, callback) {
           //redis.hset('ExportToken:tokenByBlockNumber', log.blockNumber, tokenAddress);
-          redis.hgetall('ExportToken:tokenByBlockNumber', function (err, replies) {
+          redis.hget('ExportToken:tokenByBlockNumber', block.number, function (err, replies) {
             //console.log("[BlockInfo][003]\tredis.hgetall\t", new Date().toLocaleString());
             callback(null, block, traces, replies);
           });
 
         },
-        function (block, traces, tokenByBlockNumber, callback) {
-          var tokenList = [];
-          if (tokenByBlockNumber) {
-            async.eachOfSeries(tokenByBlockNumber, function (value, key, eachOfSeriesCallback) {
-              if (key == block.number) {
-                tokenList.push(value);
-              }
-              eachOfSeriesCallback();
-            }, function (err) {
-              if (err) {
-                console.log("[ERROR]block: ", err);
-              }
-              //console.log("[BlockInfo][004]\ttokenList.push\t", new Date().toLocaleString());
-              callback(null, block, traces, tokenList);
-            });
-          } else {
-            //console.log("[BlockInfo][004]\tno contract\t", new Date().toLocaleString());
-            callback(null, block, traces, null);
-          }
-        },
-        function (block, traces, tokenList, callback) {
+        function (block, traces, replies, callback) {
+          var tokenList = JSON.parse(replies);
           if (tokenList && tokenList.length > 0) {
             var tokenEvents = [];
             async.eachSeries(tokenList, function (account, tokenListeachCallback) {
@@ -120,7 +101,7 @@ router.get('/:block', function (req, res, next) {
                 } else if (events.length >= 1) {
                   tokenEvents.push(events);
                 }
-                tokenListteachCallback();
+                tokenListeachCallback();
               });
             }, function (err) {
               //console.log("[BlockInfo][005]\ttokenListeachCallback\t", new Date().toLocaleString());
