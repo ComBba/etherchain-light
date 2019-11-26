@@ -1,11 +1,10 @@
 extends layout
 
 block content
-  link(rel='stylesheet', href='https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.css')
-  script(type='text/javascript', src='https://unpkg.com/gojs/release/go.js')
-  script(type='text/javascript', src='https://gojs.net/latest/extensions/HyperlinkText.js')
-  script(type='text/javascript', src='https://cdn.datatables.net/1.10.20/js/jquery.dataTables.js')
-  script(type='text/javascript', src='https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.js')
+  link(rel='stylesheet', href='/DataTables/datatables.min.css')
+  script(type='text/javascript', src='/GoJS-2.1.2/release/go.js')
+  script(type='text/javascript', src='/GoJS-2.1.2/extensions/HyperlinkText.js')
+  script(type='text/javascript', src='/DataTables/datatables.min.js')
   if account.isContract
     h3 Contract #{account.address}
   else
