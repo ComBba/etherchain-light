@@ -1,10 +1,8 @@
 extends layout
 
 block content
-  link(rel='stylesheet', href='/DataTables/datatables.min.css')
   script(type='text/javascript', src='/GoJS-2.1.2/release/go.js')
   script(type='text/javascript', src='/GoJS-2.1.2/extensions/HyperlinkText.js')
-  script(type='text/javascript', src='/DataTables/datatables.min.js')
   if account.isContract
     h3 Contract #{account.address}
   else

@@ -32,8 +32,16 @@ var toUtf8 = function (hex) {
     str += String.fromCharCode(code);
   }
 
+  var dec_utf8 = "";
+  try { // statements to try
+    dec_utf8 = utf8.decode(str);
+  }
+  catch (e) {
+    dec_utf8 = "Invalid UTF-8 detected";
+    console.log("[code]", e);
+  }
   //console.log("[str]", str);
-  return utf8.decode(str);
+  return dec_utf8;
 };
 
 router.get('/pending', function (req, res, next) {
