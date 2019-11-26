@@ -67,3 +67,6 @@ tokenDatastore/
 *.bak
 /initRedis.sh
 /package-lock.json
+external_apps/package-lock.json
+external_apps/package.json
+external_apps/workers_for_block_page_cache.js
