@@ -4,10 +4,9 @@ var router = express.Router();
 var async = require('async');
 var Web3 = require('web3');
 const configConstant = require('../config/configConstant');
-var Redis = require('ioredis');
+var Redis = require('redis');
 var redis = new Redis(configConstant.redisConnectString);
 var RLP = require('rlp');
-const cacheRedisKey = 'explorerBlocks:cache:';
 
 /* modified baToJSON() routine from rlp */
 function baToString(ba) {

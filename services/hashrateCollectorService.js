@@ -10,7 +10,7 @@ var hashratecollector = function (config) {
 	async.forever(
 		function (next) {
 			console.log("[▷▷▷ Start ▷▷▷][hashrateCollectorService]", printDateTime());
-			var Redis = require('ioredis');
+			var Redis = require('redis');
 			var redis = new Redis(configConstant.redisConnectString);
 			var data = {};
 			var tmpData = {};

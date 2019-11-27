@@ -6,7 +6,7 @@ var Web3 = require('web3');
 const configConstant = require('../config/configConstant');
 const configNames = require('../config/configNames.js');
 
-var Redis = require('ioredis');
+var Redis = require('redis');
 var redis = new Redis(configConstant.redisConnectString);
 
 var BigNumber = require('bignumber.js');

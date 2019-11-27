@@ -45,7 +45,6 @@ var toUtf8 = function (hex) {
 };
 
 router.get('/pending', function (req, res, next) {
-
   var config = req.app.get('config');
   var web3 = new Web3();
   web3.setProvider(config.selectParity());

@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 const configConstant = require('../config/configConstant');
-var Redis = require('ioredis');
+var Redis = require('redis');
 var redis = new Redis(configConstant.redisConnectString);
 
 var async = require('async');

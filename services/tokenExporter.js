@@ -7,7 +7,7 @@ const configConstant = require('../config/configConstant');
 var exporter = function (provider, erc20ABI, tokenAddress, createBlock, startTime) {
   var self = this;
   //console.log("[ExportToken]", tokenAddress);
-  var Redis = require('ioredis');
+  var Redis = require('redis');
   self.redis = new Redis(configConstant.redisConnectString);
   self.tokenAddress = tokenAddress;
 

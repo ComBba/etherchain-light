@@ -10,7 +10,7 @@ var accountblanceschecker = function (config, configERC20, app) {
 	async.forever(
 		function (next) {
 			console.log("[▷▷▷ Start ▷▷▷][accountBalanceService]", printDateTime());
-			var Redis = require('ioredis');
+			var Redis = require('redis');
 			var redis = new Redis(configConstant.redisConnectString);
 
 			var web3 = new Web3();

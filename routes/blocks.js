@@ -5,7 +5,7 @@ var async = require('async');
 const configConstant = require('../config/configConstant');
 const configNames = require('../config/configNames.js');
 
-var Redis = require('ioredis');
+var Redis = require('redis');
 var redis = new Redis(configConstant.redisConnectString);
 
 var _ = require('underscore');

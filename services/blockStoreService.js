@@ -18,7 +18,7 @@ var blockstore = function (app) {
 	async.forever(
 		function (next) {
 			//console.log("[▷▷▷ Start ▷▷▷][blockStoreService]", printDateTime());
-			var Redis = require('ioredis');
+			var Redis = require('redis');
 			var redis = new Redis(configConstant.redisConnectString);
 			var web3 = new Web3();
 			var config = app.get('config');

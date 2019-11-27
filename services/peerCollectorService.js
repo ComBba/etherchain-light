@@ -10,7 +10,7 @@ var peercollector = function (config) {
 	async.forever(
 		function (next) {
 			console.log("[▷▷▷ Start ▷▷▷][peerCollectorService]", printDateTime());
-			var Redis = require('ioredis');
+			var Redis = require('redis');
 			var redis = new Redis(configConstant.redisConnectString);
 			var web3 = new Web3();
 			web3.setProvider(config.selectParity());

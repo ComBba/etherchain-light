@@ -5,7 +5,7 @@ const async = require('async');
 const Web3 = require('web3');
 
 const configConstant = require('../config/configConstant');
-var Redis = require('ioredis');
+var Redis = require('redis');
 var redis = new Redis(configConstant.redisConnectString);
 
 const iso = require('iso-3166-1');

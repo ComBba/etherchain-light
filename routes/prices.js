@@ -8,7 +8,7 @@ var request = require('request');
 var async = require('async');
 
 const configConstant = require('../config/configConstant');
-var Redis = require('ioredis');
+var Redis = require('redis');
 var redis = new Redis(configConstant.redisConnectString);
 
 const pre_fix = 'exchage_prices:';

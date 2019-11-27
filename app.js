@@ -40,7 +40,7 @@ let configConstant = require('./config/configConstant');
 let level = require('level-rocksdb');
 let db = level(configConstant.dbPath);
 
-var Redis = require('ioredis');
+var Redis = require('redis');
 var redis = new Redis(configConstant.redisConnectString);
 
 let app = express();
