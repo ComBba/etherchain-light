@@ -50,33 +50,33 @@ router.get('/txlist/:address/:startblock?/:endblock?', function (req, res, next)
     web3.setProvider(new web3.providers.HttpProvider(configConstant.localRPCaddress));
 
   async.waterfall([
-      function (callback) {
-        web3.eth.getBlock("latest", false, function (err, result) {
-          callback(err, result); //마지막 블럭 정보를 받아서 전달
-        });
-      },
-      function (lastblock, callback) {
-        if (endblock > lastblock.number) {
-          options.toBlock = lastblock.number;
-        }
-        if (startblock < 1) {
-          options.fromBlock = 1;
-        }
-
-        web3.eth.getStorageAt(address, 0, function (err, result) {
-          callback(err, result);
-        });
-      },
-      function (position, callback) {
-        options.topics = [position];
-        var filter = web3.eth.filter(options);
-        console.dir(filter);
-        console.log("=================== filter ===================");
-        filter.get(function (err, result) {
-          callback(err, result);
-        });
+    function (callback) {
+      web3.eth.getBlock("latest", false, function (err, result) {
+        callback(err, result); //마지막 블럭 정보를 받아서 전달
+      });
+    },
+    function (lastblock, callback) {
+      if (endblock > lastblock.number) {
+        options.toBlock = lastblock.number;
       }
-    ],
+      if (startblock < 1) {
+        options.fromBlock = 1;
+      }
+
+      web3.eth.getStorageAt(address, 0, function (err, result) {
+        callback(err, result);
+      });
+    },
+    function (position, callback) {
+      options.topics = [position];
+      var filter = web3.eth.filter(options);
+      console.dir(filter);
+      console.log("=================== filter ===================");
+      filter.get(function (err, result) {
+        callback(err, result);
+      });
+    }
+  ],
     function (err, filterGet) {
       console.dir(err);
       console.log("=================== err ===================");
@@ -93,22 +93,22 @@ router.get('/txlist/:address/:startblock?/:endblock?', function (req, res, next)
 //http://explorer.ethersocial.info/api_account/esnsupply
 router.get('/esnsupply', function (req, res, next) {
   async.waterfall([
-      function (callback) {
-        redis.hget('esn_top100:apisupport', 'totalAccounts', function (err, result) {
-          return callback(err, result);
-        });
-      },
-      function (totalAccounts, callback) {
-        redis.hget('esn_top100:apisupport', 'activeAccounts', function (err, result) {
-          return callback(err, totalAccounts, result);
-        });
-      },
-      function (totalAccounts, activeAccounts, callback) {
-        redis.hget('esn_top100:apisupport', 'totalSupply', function (err, result) {
-          return callback(err, totalAccounts, activeAccounts, result);
-        });
-      }
-    ],
+    function (callback) {
+      redis.hget('esn_top100:apisupport', 'totalAccounts', function (err, result) {
+        return callback(err, result);
+      });
+    },
+    function (totalAccounts, callback) {
+      redis.hget('esn_top100:apisupport', 'activeAccounts', function (err, result) {
+        return callback(err, totalAccounts, result);
+      });
+    },
+    function (totalAccounts, activeAccounts, callback) {
+      redis.hget('esn_top100:apisupport', 'totalSupply', function (err, result) {
+        return callback(err, totalAccounts, activeAccounts, result);
+      });
+    }
+  ],
     function (err, totalAccounts, activeAccounts, totalSupply) {
       if (err) {
         res.json(resultToJson(err, null));
@@ -117,7 +117,7 @@ router.get('/esnsupply', function (req, res, next) {
         supplyinfo.totalAccounts = totalAccounts;
         supplyinfo.activeAccounts = activeAccounts;
         supplyinfo.totalSupply = totalSupply;
-
+        redis.disconnect();
         res.json(resultToJson(null, supplyinfo));
       }
     });
@@ -277,8 +277,8 @@ router.get('/tokenbalance/:address/:contractaddress?', function (req, res, next)
         }
       },
       function (contractAddressList, tokencallback) {
+        var tokenList = [];
         if (contractAddressList.length > 0) {
-          var tokenList = [];
           async.eachSeries(contractAddressList, function (contractaddress, accountListeachCallback) {
             tokenExporter[contractaddress].db.find({
               _id: req.params.address
@@ -305,7 +305,10 @@ router.get('/tokenbalance/:address/:contractaddress?', function (req, res, next)
           }, function (err) {
             tokencallback(err, tokenList);
           });
+        } else {
+          tokencallback(null, tokenList);
         }
+        redis.disconnect();
       }
     ], function (err, tokenList) {
       if (err) {

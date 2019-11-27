@@ -3,9 +3,6 @@ const async = require('async');
 const Web3 = require('web3');
 
 const configConstant = require('../config/configConstant');
-var Redis = require('ioredis');
-var redis = new Redis(configConstant.redisConnectString);
-
 const finalRdsKey = 'esn_top100';
 const readyRdsKey = 'ready_esn_top100';
 
@@ -13,6 +10,9 @@ var accountblanceschecker = function (config, configERC20, app) {
 	async.forever(
 		function (next) {
 			console.log("[▷▷▷ Start ▷▷▷][accountBalanceService]", printDateTime());
+			var Redis = require('ioredis');
+			var redis = new Redis(configConstant.redisConnectString);
+
 			var web3 = new Web3();
 			web3.setProvider(config.selectParity());
 
@@ -251,6 +251,7 @@ var accountblanceschecker = function (config, configERC20, app) {
 					}
 					console.log("[□□□□ End □□□□][accountBalanceService]", printDateTime(), nowcnt, "/", allcnt, "[", ((nowcnt / allcnt) * 100).toLocaleString(), "% ]");
 				}
+				redis.disconnect();
 				setTimeout(function () {
 					next();
 				}, configConstant.accountBalanceServiceInterval);

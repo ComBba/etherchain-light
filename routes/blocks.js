@@ -57,6 +57,7 @@ router.all('/:query', function (req, res, next) {
       }
     ],
     function (err, zcard, blockInfoList) {
+      redis.disconnect();
       if (err) {
         console.log("Final Error ", err);
         return next(err);

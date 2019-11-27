@@ -49,6 +49,7 @@ router.get('/:block', function (req, res, next) {
   return redis.get(cacheRedisKey.concat(req.params.block), (err, cacheBlock) => {
     // If that key exists in Redis store
     if (cacheBlock) {
+      redis.disconnect();
       res.render('block', {
         block: JSON.parse(cacheBlock)
       });
@@ -169,6 +170,7 @@ router.get('/:block', function (req, res, next) {
           //console.log("[BlockInfo][008]\tres.render\t", new Date().toLocaleString());
           redis.set(cacheRedisKey.concat(block.number), JSON.stringify(block))
           redis.set(cacheRedisKey.concat(block.hash), JSON.stringify(block))
+          redis.disconnect();
           res.render('block', {
             block: block
           });

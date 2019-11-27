@@ -5,13 +5,14 @@ const configConstant = require('../config/configConstant');
 var BigNumber = require('bignumber.js');
 var getJSON = require('get-json');
 var request = require('request');
-var Redis = require('ioredis');
-var redis = new Redis(configConstant.redisConnectString);
 
 var prices = function () {
 	async.forever(
 		function (next) {
 			console.log("[▷▷▷ Start ▷▷▷][PricesService]", printDateTime());
+			var Redis = require('ioredis');
+			var redis = new Redis(configConstant.redisConnectString);
+
 			var data = {};
 			async.waterfall([
 				function (callback) {
@@ -80,6 +81,7 @@ var prices = function () {
 					console.log("Error ", err);
 				}
 				console.log("[□□□□ End □□□□][PriceService]", printDateTime());
+				redis.disconnect();
 				setTimeout(function () {
 					next();
 				}, configConstant.PriceServiceInterval);

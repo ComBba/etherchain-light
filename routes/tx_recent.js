@@ -93,6 +93,7 @@ router.all('/transactions/:query', function (req, res, next) {
       }
     ],
     function (err, zcard, txInfoList) {
+      redis.disconnect();
       if (err) {
         console.log("Final Error ", err);
         return next(err);

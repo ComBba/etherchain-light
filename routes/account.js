@@ -135,6 +135,7 @@ router.all('/transactions/:account/:query/:page?/:length?', function (req, res, 
         }
     ],
         function (err, zcard, txInfoList) {
+            redis.disconnect();
             if (err) {
                 console.log("Final Error ", err);
                 return next(err);
@@ -677,6 +678,7 @@ router.get('/:account/:offset?/:count?/:json?', function (req, res, next) {
         }
     ],
         function (err, tokenEvents) {
+            redis.disconnect();
             if (err) {
                 console.log("Final Error ", err);
                 return next(err);

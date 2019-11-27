@@ -3,12 +3,12 @@ var Web3 = require('web3');
 var tokenDatastore = require('nedb-core');
 
 const configConstant = require('../config/configConstant');
-var Redis = require('ioredis');
-var redis = new Redis(configConstant.redisConnectString);
 
 var exporter = function (provider, erc20ABI, tokenAddress, createBlock, startTime) {
   var self = this;
   //console.log("[ExportToken]", tokenAddress);
+  var Redis = require('ioredis');
+  self.redis = new Redis(configConstant.redisConnectString);
   self.tokenAddress = tokenAddress;
 
   self.db = new tokenDatastore({
@@ -190,18 +190,18 @@ var exporter = function (provider, erc20ABI, tokenAddress, createBlock, startTim
             console.log("Error inserting log:", err);
           }
         } else {
-            redis.hget('ExportToken:tokenByBlockNumber', log.blockNumber, function (err, replies) {
-                var arrTokenAddress = replies && !err ? JSON.parse(replies) : [];
-                arrTokenAddress.push(tokenAddress);
-                redis.hset('ExportToken:tokenByBlockNumber', log.blockNumber, JSON.stringify(arrTokenAddress));
-            });
-          if(startLogBlockNumber > log.blockNumber){
+          self.redis.hget('ExportToken:tokenByBlockNumber', log.blockNumber, function (err, replies) {
+            var arrTokenAddress = replies && !err ? JSON.parse(replies) : [];
+            arrTokenAddress.push(tokenAddress);
+            self.redis.hset('ExportToken:tokenByBlockNumber', log.blockNumber, JSON.stringify(arrTokenAddress));
+          });
+          if (startLogBlockNumber > log.blockNumber) {
             startLogBlockNumber = log.blockNumber;
-            //redis.hset('ExportToken:createBlock:', tokenAddress, log.blockNumber);
+            //self.redis.hset('ExportToken:createBlock:', tokenAddress, log.blockNumber);
           }
-          if(lastLogBlockNumber < log.blockNumber){
+          if (lastLogBlockNumber < log.blockNumber) {
             lastLogBlockNumber = log.blockNumber;
-            //redis.hset('ExportToken:lastBlock:', tokenAddress, log.blockNumber);
+            //self.redis.hset('ExportToken:lastBlock:', tokenAddress, log.blockNumber);
           }
         }
         callback();

@@ -4,15 +4,14 @@ const geoip = require('geoip-lite');
 const tcpPortUsed = require('tcp-port-used');
 
 const configConstant = require('../config/configConstant');
-var Redis = require('ioredis');
-var redis = new Redis(configConstant.redisConnectString);
-
 const pre_fix = 'explorerPeers:';
 
 var peercollector = function (config) {
 	async.forever(
 		function (next) {
 			console.log("[▷▷▷ Start ▷▷▷][peerCollectorService]", printDateTime());
+			var Redis = require('ioredis');
+			var redis = new Redis(configConstant.redisConnectString);
 			var web3 = new Web3();
 			web3.setProvider(config.selectParity());
 			var data = {};
@@ -243,6 +242,7 @@ var peercollector = function (config) {
 					console.log("Error ", err);
 				}
 				console.log("[□□□□ End □□□□][peerCollectorService]", printDateTime(), data.peers.length, "peers");
+				redis.disconnect();
 				setTimeout(function () {
 					next();
 				}, configConstant.peerCollectorServiceInterval);

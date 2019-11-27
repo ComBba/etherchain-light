@@ -275,6 +275,7 @@ router.get('/:tx', function (req, res, next) {
             }
 
             redis.set(cacheRedisKey.concat(req.params.tx), JSON.stringify(tx))
+            redis.disconnect();
             res.render('tx', {
               tx: tx
             });

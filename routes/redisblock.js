@@ -156,7 +156,7 @@ router.get('/:end?', function (req, res, next) {
       maximumFractionDigits: 4
     }) + " s";
 
-
+    redis.disconnect();
     res.render('redisblock', {
       startTime: data.startTime,
       PerBlock: data.blockCount.toLocaleString(),

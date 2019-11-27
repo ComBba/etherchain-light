@@ -49,6 +49,7 @@ router.get('/:json?', function (req, res, next) {
 			});
 		}
 	], function (peers, err) {
+		redis.disconnect();
 		if (err) {
 			console.log("Error ", err);
 			return next(err);
