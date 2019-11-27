@@ -88,7 +88,13 @@ router.get('/:block', function (req, res, next) {
 
         },
         function (block, traces, replies, callback) {
-          var tokenList = JSON.parse(replies);
+          var tokenList = [];
+          try { // statements to try
+            tokenList = JSON.parse(replies);
+          }
+          catch (e) {
+            console.log(e); // pass exception object to error handler
+          }
           if (tokenList && tokenList.length > 0) {
             var tokenEvents = [];
             async.eachSeries(tokenList, function (account, tokenListeachCallback) {
