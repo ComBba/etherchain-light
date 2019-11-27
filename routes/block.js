@@ -89,6 +89,7 @@ router.get('/:block', function (req, res, next) {
         },
         function (block, traces, replies, callback) {
           var tokenList = [];
+          console.dir(replies);
           try { // statements to try
             tokenList = JSON.parse(replies);
           }
