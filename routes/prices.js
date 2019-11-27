@@ -272,7 +272,7 @@ router.get('/', function (req, res, next) {
       }
     ],
     function (err) {
-      redis.disconnect();
+      
       if (err) {
         console.log("[Error][Prices]", err);
         return next(err);

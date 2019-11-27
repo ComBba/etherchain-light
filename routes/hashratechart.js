@@ -134,7 +134,7 @@ router.get('/', function (req, res, next) {
       callback(null);
     }
   ], function (err) {
-    redis.disconnect();
+    
     if (err) {
       console.log("Error ", err);
       return next(err);

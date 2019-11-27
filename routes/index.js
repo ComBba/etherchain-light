@@ -111,7 +111,7 @@ router.get('/', function (req, res, next) {
       }
     ],
     function (err, tmpBlocks, blocks) {
-      redis.disconnect();
+      
       if (err) {
         console.log("Error ", err);
         return next(err);

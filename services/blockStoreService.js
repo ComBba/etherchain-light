@@ -350,7 +350,7 @@ var blockstore = function (app) {
 				if (maxBlockNumber > 0) {
 					console.log("[□□□□ End □□□□][blockStoreService]", printDateTime(), "~".concat(numberWithCommas(maxBlockNumber)), "block");
 				}
-				redis.disconnect();
+				
 				setTimeout(function () {
 					next();
 				}, configConstant.blockStoreServiceInterval);
