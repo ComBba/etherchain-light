@@ -5,13 +5,13 @@ const configConstant = require('../config/configConstant');
 const pre_fix = 'explorerBlocks:';
 const pre_fix_chart = 'explorerBlocksChart:';
 const divide = 10000;
+let Redis = require('redis');
+let redis = new Redis(configConstant.redisConnectString);
 
 var hashratecollector = function (config) {
 	async.forever(
 		function (next) {
 			console.log("[▷▷▷ Start ▷▷▷][hashrateCollectorService]", printDateTime());
-			var Redis = require('redis');
-			var redis = new Redis(configConstant.redisConnectString);
 			var data = {};
 			var tmpData = {};
 			tmpData.BlockTime = [];
@@ -294,7 +294,7 @@ var hashratecollector = function (config) {
 
 					console.log("[□□□□ End □□□□][hashrateCollectorService]", printDateTime(), "~".concat(numberWithCommas(dbSaveDatas.xBlocknumber[dbSaveDatas.xBlocknumber.length - 1])), "block");
 				}
-				
+
 				setTimeout(function () {
 					next();
 				}, configConstant.hashrateCollectorServiceInterval);

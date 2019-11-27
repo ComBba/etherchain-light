@@ -5,13 +5,13 @@ const tcpPortUsed = require('tcp-port-used');
 
 const configConstant = require('../config/configConstant');
 const pre_fix = 'explorerPeers:';
+let Redis = require('redis');
+let redis = new Redis(configConstant.redisConnectString);
 
 var peercollector = function (config) {
 	async.forever(
 		function (next) {
 			console.log("[▷▷▷ Start ▷▷▷][peerCollectorService]", printDateTime());
-			var Redis = require('redis');
-			var redis = new Redis(configConstant.redisConnectString);
 			var web3 = new Web3();
 			web3.setProvider(config.selectParity());
 			var data = {};

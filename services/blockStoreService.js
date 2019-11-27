@@ -11,6 +11,8 @@ const pre_fix = 'explorerBlocks:';
 const pre_fix_tx = 'explorerTransactions:';
 const pre_fix_account_tx = 'explorerAccountTx:';
 const configConstant = require('../config/configConstant');
+let Redis = require('redis');
+let redis = new Redis(configConstant.redisConnectString);
 
 var blockstore = function (app) {
 	var tokenExporter = app.get('tokenExporter');
@@ -18,8 +20,6 @@ var blockstore = function (app) {
 	async.forever(
 		function (next) {
 			//console.log("[▷▷▷ Start ▷▷▷][blockStoreService]", printDateTime());
-			var Redis = require('redis');
-			var redis = new Redis(configConstant.redisConnectString);
 			var web3 = new Web3();
 			var config = app.get('config');
 			if (!web3.currentProvider)

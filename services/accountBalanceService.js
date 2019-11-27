@@ -5,13 +5,13 @@ const Web3 = require('web3');
 const configConstant = require('../config/configConstant');
 const finalRdsKey = 'esn_top100';
 const readyRdsKey = 'ready_esn_top100';
+var Redis = require('redis');
+var redis = new Redis(configConstant.redisConnectString);
 
 var accountblanceschecker = function (config, configERC20, app) {
 	async.forever(
 		function (next) {
 			console.log("[▷▷▷ Start ▷▷▷][accountBalanceService]", printDateTime());
-			var Redis = require('redis');
-			var redis = new Redis(configConstant.redisConnectString);
 
 			var web3 = new Web3();
 			web3.setProvider(config.selectParity());

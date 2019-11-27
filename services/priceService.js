@@ -5,13 +5,13 @@ const configConstant = require('../config/configConstant');
 var BigNumber = require('bignumber.js');
 var getJSON = require('get-json');
 var request = require('request');
+let Redis = require('redis');
+let redis = new Redis(configConstant.redisConnectString);
 
 var prices = function () {
 	async.forever(
 		function (next) {
 			console.log("[▷▷▷ Start ▷▷▷][PricesService]", printDateTime());
-			var Redis = require('redis');
-			var redis = new Redis(configConstant.redisConnectString);
 
 			var data = {};
 			async.waterfall([
