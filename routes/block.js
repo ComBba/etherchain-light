@@ -5,8 +5,6 @@ var async = require('async');
 var Web3 = require('web3');
 
 const configConstant = require('../config/configConstant');
-var Redis = require('ioredis');
-var redis = new Redis(configConstant.redisConnectString);
 
 var RLP = require('rlp');
 const cacheRedisKey = 'explorerBlocks:cache:';
@@ -46,10 +44,11 @@ var hex2ascii = function (hexIn) {
 };
 
 router.get('/:block', function (req, res, next) {
+  var Redis = require('ioredis');
+  var redis = new Redis(configConstant.redisConnectString);
   return redis.get(cacheRedisKey.concat(req.params.block), (err, cacheBlock) => {
     // If that key exists in Redis store
     if (cacheBlock) {
-      redis.disconnect();
       res.render('block', {
         block: JSON.parse(cacheBlock)
       });
@@ -181,13 +180,13 @@ router.get('/:block', function (req, res, next) {
           //console.log("[BlockInfo][008]\tres.render\t", new Date().toLocaleString());
           redis.set(cacheRedisKey.concat(block.number), JSON.stringify(block))
           redis.set(cacheRedisKey.concat(block.hash), JSON.stringify(block))
-          redis.disconnect();
           res.render('block', {
             block: block
           });
         }
       });
     }
+    redis.disconnect();
   });
 });
 
