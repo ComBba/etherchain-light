@@ -169,7 +169,7 @@ router.get('/:block', function (req, res, next) {
     } else {
       //console.dir(block);
       //console.log("[BlockInfo][008]\tres.render\t", new Date().toLocaleString());
-      redis.disconnect();
+      //redis.disconnect();
       res.render('block', {
         block: block
       });
