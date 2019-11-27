@@ -11,8 +11,11 @@ const pre_fix = 'explorerBlocks:';
 const pre_fix_tx = 'explorerTransactions:';
 const pre_fix_account_tx = 'explorerAccountTx:';
 const configConstant = require('../config/configConstant');
-let Redis = require('redis');
-let redis = new Redis(configConstant.redisConnectString);
+var Redis = require("redis"),
+  redis = Redis.createClient(configConstant.redisConnectString);
+redis.on("error", function (err) {
+  console.log("Error " + err);
+});
 
 var blockstore = function (app) {
 	var tokenExporter = app.get('tokenExporter');

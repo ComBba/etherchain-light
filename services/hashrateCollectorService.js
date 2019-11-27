@@ -5,8 +5,11 @@ const configConstant = require('../config/configConstant');
 const pre_fix = 'explorerBlocks:';
 const pre_fix_chart = 'explorerBlocksChart:';
 const divide = 10000;
-let Redis = require('redis');
-let redis = new Redis(configConstant.redisConnectString);
+var Redis = require("redis"),
+  redis = Redis.createClient(configConstant.redisConnectString);
+redis.on("error", function (err) {
+  console.log("Error " + err);
+});
 
 var hashratecollector = function (config) {
 	async.forever(

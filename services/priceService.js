@@ -5,8 +5,11 @@ const configConstant = require('../config/configConstant');
 var BigNumber = require('bignumber.js');
 var getJSON = require('get-json');
 var request = require('request');
-let Redis = require('redis');
-let redis = new Redis(configConstant.redisConnectString);
+var Redis = require("redis"),
+	redis = Redis.createClient(configConstant.redisConnectString);
+redis.on("error", function (err) {
+	console.log("Error " + err);
+});
 
 var prices = function () {
 	async.forever(
@@ -81,7 +84,7 @@ var prices = function () {
 					console.log("Error ", err);
 				}
 				console.log("[□□□□ End □□□□][PriceService]", printDateTime());
-				
+
 				setTimeout(function () {
 					next();
 				}, configConstant.PriceServiceInterval);

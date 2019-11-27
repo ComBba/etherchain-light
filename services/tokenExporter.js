@@ -3,8 +3,11 @@ var Web3 = require('web3');
 var tokenDatastore = require('nedb-core');
 
 const configConstant = require('../config/configConstant');
-let Redis = require('redis');
-let redis = new Redis(configConstant.redisConnectString);
+var Redis = require("redis"),
+  redis = Redis.createClient(configConstant.redisConnectString);
+redis.on("error", function (err) {
+  console.log("Error " + err);
+});
 
 var exporter = function (provider, erc20ABI, tokenAddress, createBlock, startTime) {
   var self = this;

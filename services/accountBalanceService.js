@@ -5,8 +5,11 @@ const Web3 = require('web3');
 const configConstant = require('../config/configConstant');
 const finalRdsKey = 'esn_top100';
 const readyRdsKey = 'ready_esn_top100';
-var Redis = require('redis');
-var redis = new Redis(configConstant.redisConnectString);
+var Redis = require("redis"),
+  redis = Redis.createClient(configConstant.redisConnectString);
+redis.on("error", function (err) {
+  console.log("Error " + err);
+});
 
 var accountblanceschecker = function (config, configERC20, app) {
 	async.forever(

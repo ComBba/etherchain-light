@@ -6,8 +6,11 @@ const configConstant = require('../config/configConstant');
 var Web3 = require('web3');
 var web3 = new Web3();
 var BigNumber = require('bignumber.js');
-var Redis = require('redis');
-var redis = new Redis(configConstant.redisConnectString);
+var Redis = require("redis"),
+  redis = Redis.createClient(configConstant.redisConnectString);
+redis.on("error", function (err) {
+  console.log("Error " + err);
+});
 
 function resultToJson(err, param) {
   var result = {};

@@ -40,8 +40,11 @@ let configConstant = require('./config/configConstant');
 let level = require('level-rocksdb');
 let db = level(configConstant.dbPath);
 
-var Redis = require('redis');
-var redis = new Redis(configConstant.redisConnectString);
+var Redis = require("redis"),
+  redis = Redis.createClient(configConstant.redisConnectString);
+redis.on("error", function (err) {
+  console.log("Error " + err);
+});
 
 let app = express();
 app.use(compression({

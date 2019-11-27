@@ -7,8 +7,11 @@ var web3 = new Web3();
 const configConstant = require('../config/configConstant');
 const configNames = require('../config/configNames.js');
 
-var Redis = require('redis');
-var redis = new Redis(configConstant.redisConnectString);
+var Redis = require("redis"),
+  redis = Redis.createClient(configConstant.redisConnectString);
+redis.on("error", function (err) {
+  console.log("Error " + err);
+});
 const pre_fix = 'explorerBlocks:';
 const divide = 10000;
 
