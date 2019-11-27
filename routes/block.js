@@ -46,7 +46,7 @@ var hex2ascii = function (hexIn) {
 router.get('/:block', function (req, res, next) {
   var Redis = require('ioredis');
   var redis = new Redis(configConstant.redisConnectString);
-  return redis.get(cacheRedisKey.concat(req.params.block), (err, cacheBlock) => {
+  redis.get(cacheRedisKey.concat(req.params.block), (err, cacheBlock) => {
     // If that key exists in Redis store
     if (cacheBlock) {
       res.render('block', {
@@ -186,8 +186,8 @@ router.get('/:block', function (req, res, next) {
         }
       });
     }
-    redis.disconnect();
   });
+  redis.disconnect();
 });
 
 router.get('/uncle/:hash/:number', function (req, res, next) {
