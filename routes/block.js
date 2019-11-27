@@ -80,25 +80,26 @@ router.get('/:block', function (req, res, next) {
           });
         },
         function (block, traces, callback) {
-          //redis.hset('ExportToken:tokenByBlockNumber', log.blockNumber, tokenAddress);
-          redis.hget('ExportToken:tokenByBlockNumber', block.number, function (err, replies) {
+          redis.hget('ExportToken:tokenByBlockNumber', block.number, function (err, tokenByBlockNumber) {
             //console.log("[BlockInfo][003]\tredis.hgetall\t", new Date().toLocaleString());
-            callback(null, block, traces, replies);
+            callback(err, block, traces, tokenByBlockNumber);
           });
 
         },
-        function (block, traces, replies, callback) {
-          var tokenList = [];
-          if (!replies && replies == undefined) {
+        function (block, traces, tokens, callback) {
+          if (!tokens && tokens == undefined) {
             return callback(null, null, block, traces);
           }
-          console.dir(replies);
+          console.dir(tokens);
+
+          var tokenList = [];
           try { // statements to try
-            tokenList = JSON.parse(replies);
+            tokenList = JSON.parse(tokens);
           }
           catch (e) {
             console.log(e); // pass exception object to error handler
           }
+
           if (tokenList && tokenList.length > 0) {
             var tokenEvents = [];
             async.eachSeries(tokenList, function (account, tokenListeachCallback) {
