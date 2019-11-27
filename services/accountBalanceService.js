@@ -251,7 +251,7 @@ var accountblanceschecker = function (config, configERC20, app) {
 					}
 					console.log("[□□□□ End □□□□][accountBalanceService]", printDateTime(), nowcnt, "/", allcnt, "[", ((nowcnt / allcnt) * 100).toLocaleString(), "% ]");
 				}
-				redis.disconnect();
+				
 				setTimeout(function () {
 					next();
 				}, configConstant.accountBalanceServiceInterval);

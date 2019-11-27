@@ -79,7 +79,6 @@ router.get('/summary/:count?', function (req, res, next) {
           });
         }
       }, function (err, blocks) {
-        redis.disconnect();
         return callback(err, blocks);
       });
     }

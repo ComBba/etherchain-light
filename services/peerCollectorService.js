@@ -242,7 +242,7 @@ var peercollector = function (config) {
 					console.log("Error ", err);
 				}
 				console.log("[□□□□ End □□□□][peerCollectorService]", printDateTime(), data.peers.length, "peers");
-				redis.disconnect();
+				
 				setTimeout(function () {
 					next();
 				}, configConstant.peerCollectorServiceInterval);

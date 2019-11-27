@@ -81,7 +81,7 @@ var prices = function () {
 					console.log("Error ", err);
 				}
 				console.log("[□□□□ End □□□□][PriceService]", printDateTime());
-				redis.disconnect();
+				
 				setTimeout(function () {
 					next();
 				}, configConstant.PriceServiceInterval);

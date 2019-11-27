@@ -117,7 +117,6 @@ router.get('/esnsupply', function (req, res, next) {
         supplyinfo.totalAccounts = totalAccounts;
         supplyinfo.activeAccounts = activeAccounts;
         supplyinfo.totalSupply = totalSupply;
-        redis.disconnect();
         res.json(resultToJson(null, supplyinfo));
       }
     });
@@ -308,7 +307,6 @@ router.get('/tokenbalance/:address/:contractaddress?', function (req, res, next)
         } else {
           tokencallback(null, tokenList);
         }
-        redis.disconnect();
       }
     ], function (err, tokenList) {
       if (err) {

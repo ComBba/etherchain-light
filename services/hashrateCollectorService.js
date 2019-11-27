@@ -294,7 +294,7 @@ var hashratecollector = function (config) {
 
 					console.log("[□□□□ End □□□□][hashrateCollectorService]", printDateTime(), "~".concat(numberWithCommas(dbSaveDatas.xBlocknumber[dbSaveDatas.xBlocknumber.length - 1])), "block");
 				}
-				redis.disconnect();
+				
 				setTimeout(function () {
 					next();
 				}, configConstant.hashrateCollectorServiceInterval);

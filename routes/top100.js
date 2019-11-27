@@ -172,7 +172,7 @@ router.get('/:json?', function (req, res, next) {
 		}
 	],
 		function (err, contracts, lastaccount, totalAccounts, nowAccounts, accounts_create_time, accounts_special, accounts_normal, activeAccounts, totalSupply, specialSupply, normalSupply) {
-			redis.disconnect();
+			
 			if (err) {
 				console.log("Error ", err);
 				return next(err);
