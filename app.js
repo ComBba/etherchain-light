@@ -243,7 +243,6 @@ async.waterfall([
     cronServices.priceService = new priceService();
     cronServices.hashrateCollectorService = new hashrateCollectorService(config);
   }
-  redis.disconnect();
 });
 
 function shouldCompress(req, res) {
