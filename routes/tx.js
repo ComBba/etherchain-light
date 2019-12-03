@@ -283,10 +283,14 @@ router.get('/raw/:tx', function (req, res, next) {
       });
     },
     function (tx, callback) {
-      web3.trace.replayTransaction(tx.hash, ["vmTrace", "trace", "stateDiff"], function (err, traces) {
-        tx.traces = traces;
-        return callback(err, tx);
-      });
+      if (tx && tx.hash) {
+        web3.trace.replayTransaction(tx.hash, ["vmTrace", "trace", "stateDiff"], function (err, traces) {
+          tx.traces = traces;
+          return callback(err, tx);
+        });
+      } else {
+        return callback({ message: "Error : No tx or tx.hash " }, null);
+      }
     }
   ], function (err, tx) {
     if (err) {
