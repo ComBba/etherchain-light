@@ -515,6 +515,9 @@ router.get('/:account/:offset?/:count?/:json?', function (req, res, next) {
                             function (totraces, fromtraces, incallback) {
                                 var traces = totraces.concat(fromtraces);
                                 var sortedTraces = traces.sort(function (a, b) {
+                                    if (!a.blockNumber || !b.blockNumber) {
+                                        return 0;
+                                    }
                                     return (a.blockNumber < b.blockNumber) ? 1 : ((b.blockNumber < a.blockNumber) ? -1 : 0);
                                 });
 
