@@ -444,7 +444,7 @@ router.get('/:account/:offset?/:count?/:json?', function (req, res, next) {
                                     contractcallback(block.timestamp, err);
                                 });
                             } else {
-                                contractcallback(null, err);
+                                contractcallback(null, null);
                             }
                         }
                     ],
