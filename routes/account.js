@@ -420,8 +420,6 @@ router.get('/:account/:offset?/:count?/:json?', function (req, res, next) {
             data.previousBlockNumber = (startNum - 1 < devide) ? 1 : (startNum - 1);
             data.fromBlock = startNum < devide ? 1 : startNum;
             if (cevents) {
-                var web3_tmp = new Web3();
-                web3_tmp.setProvider(config.selectParity());
                 async.eachSeries(cevents, function (event, contracteachCallback) {
                     async.waterfall([
                         function (contractcallback) {
@@ -440,7 +438,7 @@ router.get('/:account/:offset?/:count?/:json?', function (req, res, next) {
                             //console.log("_value: ", amount, "blockNumber: ", blockNumber);
                             if (amount) {
                                 event.args._value = amount;
-                                web3_tmp.eth.getBlock(blockNumber, false, function (err, block) {
+                                web3.eth.getBlock(blockNumber, false, function (err, block) {
                                     contractcallback(block.timestamp, err);
                                 });
                             } else {
@@ -466,8 +464,6 @@ router.get('/:account/:offset?/:count?/:json?', function (req, res, next) {
                     callback(err, contractEvents);
                 });
             } else {
-                var web3_tmp = new Web3();
-                web3_tmp.setProvider(config.selectParity());
                 async.eachSeries(totalblocks, function (subblocks, outeachCallback) {
                     //console.log("[TAG Test] subblocks: ", subblocks, " Object.size(blocks): ", Object.size(blocks), " data.max_blocks: ", data.max_blocks);
                     if (Object.size(blocks) >= data.max_blocks) {
@@ -477,7 +473,7 @@ router.get('/:account/:offset?/:count?/:json?', function (req, res, next) {
                         const endblocknumber = subblocks.toString(16);
                         async.waterfall([
                             function (incallback) {
-                                web3_tmp.trace.filter({
+                                web3.trace.filter({
                                     "fromBlock": "0x" + startblocknumber,
                                     "toBlock": "0x" + endblocknumber,
                                     "toAddress": [data.address]
@@ -496,7 +492,7 @@ router.get('/:account/:offset?/:count?/:json?', function (req, res, next) {
                                 });
                             },
                             function (totraces, incallback) {
-                                web3_tmp.trace.filter({
+                                web3.trace.filter({
                                     "fromBlock": "0x" + startblocknumber,
                                     "toBlock": "0x" + endblocknumber,
                                     "fromAddress": [data.address]
@@ -531,7 +527,7 @@ router.get('/:account/:offset?/:count?/:json?', function (req, res, next) {
                                         trace.action._value = '';
                                         trace.action._to = '';
                                         if (trace.type === 'reward') {
-                                            web3_tmp.eth.getBlock(num, true, function (err, result) {
+                                            web3.eth.getBlock(num, true, function (err, result) {
                                                 if (!err && result.transactions && result.transactions.length > 0 && trace.action.value == '0x4563918244f40000') {
                                                     //console.log("result.transactions: ", result.transactions);
                                                     var gasUsed = new BigNumber(result.gasUsed);
