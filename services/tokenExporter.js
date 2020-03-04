@@ -195,7 +195,12 @@ var exporter = function (provider, erc20ABI, tokenAddress, createBlock, startTim
           }
         } else {
           redis.hget('ExportToken:tokenByBlockNumber', log.blockNumber, function (err, replies) {
-            var arrTokenAddress = replies && !err ? JSON.parse(replies) : [];
+            var arrTokenAddress = [];
+            try {
+              arrTokenAddress = replies && !err ? JSON.parse(replies) : [];
+            } catch (error) {
+              console.log("Error JSON.parse(tokenByBlockNumber):", replies, error);
+            }
             arrTokenAddress.push(tokenAddress);
             redis.hset('ExportToken:tokenByBlockNumber', log.blockNumber, JSON.stringify(arrTokenAddress));
           });
