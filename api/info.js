@@ -44,7 +44,7 @@ Object.size = function (obj) {
 router.get('/summary/:count?', function (req, res, next) {
   var data = {};
   if (!web3.currentProvider)
-    web3.setProvider(new web3.providers.HttpProvider(configConstant.localRPCaddress));
+    web3.setProvider(new web3.providers.HttpProvider(configConstant.remoteRPCaddress));
 
   async.waterfall([
     function (callback) {

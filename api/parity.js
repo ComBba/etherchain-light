@@ -8,7 +8,7 @@ var jaysonclient = null;
 
 function getJayson() {
   if (!jaysonclient)
-    jaysonclient = jayson.client.http(configConstant.localRPCaddress);
+    jaysonclient = jayson.client.http(configConstant.remoteRPCaddress);
   return jaysonclient;
 }
 

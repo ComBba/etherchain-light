@@ -6,7 +6,7 @@ const configConstant = require('../config/configConstant');
 
 function getWeb3() {
   if (!web3.currentProvider)
-    web3.setProvider(new web3.providers.HttpProvider(configConstant.localRPCaddress));
+    web3.setProvider(new web3.providers.HttpProvider(configConstant.remoteRPCaddress));
   return web3;
 }
 
