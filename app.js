@@ -82,8 +82,10 @@ async.waterfall([
     sortable.sort(function (a, b) {
       return Number(a[1]) - Number(b[1]);
     });
-
-    async.eachSeries(sortable, function (iter, forEachOfCallback) {
+    callback(null, sortable);
+  },
+  function (filtered, callback) {
+    async.eachSeries(filtered, function (iter, forEachOfCallback) {
       var eventslength = iter[1],
         account = iter[0];
       if (eventslength > 0) {
