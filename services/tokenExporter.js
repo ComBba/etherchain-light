@@ -16,7 +16,7 @@ var exporter = function (provider, erc20ABI, tokenAddress, createBlock, startTim
 
   self.db = new tokenDatastore({
     filename: './tokenDatastore/' + tokenAddress + '.nedb',
-    autoload: true
+  //  autoload: true
   });
 
   self.db.ensureIndex({
