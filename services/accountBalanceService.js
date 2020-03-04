@@ -1,14 +1,15 @@
 const BigNumber = require('bignumber.js');
 const async = require('async');
 const Web3 = require('web3');
+const tokenExporterService = require('../services/tokenExporter.js');
 
 const configConstant = require('../config/configConstant');
 const finalRdsKey = 'esn_top100';
 const readyRdsKey = 'ready_esn_top100';
 var Redis = require("redis"),
-  redis = Redis.createClient(configConstant.redisConnectString);
+	redis = Redis.createClient(configConstant.redisConnectString);
 redis.on("error", function (err) {
-  console.log("Error " + err);
+	console.log("Error " + err);
 });
 
 var accountblanceschecker = function (config, configERC20, app) {
@@ -140,11 +141,11 @@ var accountblanceschecker = function (config, configERC20, app) {
 				},
 				function (accountsCodes, callback) {
 					async.eachSeries(accountsCodes, function (accountCode, eachCallback) {
-						//console.log("[Top100]", accountCode.account, accountCode.code.substr(0, 10), accountCode.balance);
+						console.log("[Top100]", accountCode.account, accountCode.code.substr(0, 10), accountCode.balance);
 						data = accountCode.account;
 						if (accountCode.code !== "0x" && !tokenExporter[accountCode.account]) {
-							var tokenExporterService = require('../services/tokenExporter.js');
-							tokenExporter[accountCode.account] = new tokenExporterService(config.providerIpc, configERC20.erc20ABI, accountCode.account, 1, 10);
+							var now = new Date();
+							tokenExporter[accountCode.account] = new tokenExporterService(config.providerIpc, configERC20.erc20ABI, accountCode.account, 1, now.getTime());
 							app.set('tokenExporter', tokenExporter);
 						}
 
@@ -254,7 +255,7 @@ var accountblanceschecker = function (config, configERC20, app) {
 					}
 					console.log("[□□□□ End □□□□][accountBalanceService]", printDateTime(), nowcnt, "/", allcnt, "[", ((nowcnt / allcnt) * 100).toLocaleString(), "% ]");
 				}
-				
+
 				setTimeout(function () {
 					next();
 				}, configConstant.accountBalanceServiceInterval);
