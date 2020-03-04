@@ -73,7 +73,8 @@ async.waterfall([
     //console.dir(contractsWithEventsLength);
     let sortable = [];
     for (let adr in contractsWithEventsLength) {
-      sortable.push([adr, contractsWithEventsLength[adr]]);
+      if (contractsWithEventsLength > 0)
+        sortable.push([adr, contractsWithEventsLength[adr]]);
     }
     sortable.sort(function (a, b) {
       return Number(a[1]) - Number(b[1]);
@@ -105,7 +106,7 @@ async.waterfall([
           });
         })
         .done(function (result) {
-            forEachOfCallback();
+          forEachOfCallback();
         });
     }, function (err) {
       if (err) {
