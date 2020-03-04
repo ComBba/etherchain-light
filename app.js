@@ -87,14 +87,12 @@ async.waterfall([
   function (filtered, callback) {
     async.eachSeries(filtered, function (iter, forEachOfCallback) {
       var eventslength = iter[1],
-        account = iter[0];
+        filteredAccount = iter[0];
       if (eventslength > 0) {
-        contractAccountList.push(account);
+        contractAccountList.push(filteredAccount);
       }
-      //console.log(account,"start", Date.now());
-
       /*tokenExporter system error checking...
-             redis.hget('ExportToken:createBlock:', account, function (err, createBlockNumber) {
+             redis.hget('ExportToken:createBlock:', filteredAccount, function (err, createBlockNumber) {
               if (!createBlockNumber) {
                 createBlockNumber = 1;
               }
@@ -102,14 +100,16 @@ async.waterfall([
        */
       createBlockNumber = 1;
       var now = new Date();
-      tokenExporter[account] = new tokenExporterService(config.providerIpc, configERC20.erc20ABI, account, createBlockNumber, now.getTime());
-      //tokenExporter[account] = new tokenExporterService(config.selectParity(), configERC20.erc20ABI, account, createBlockNumber, now.getTime());
+
+      console.log(filteredAccount, eventslength, "start", Date.now());
+      tokenExporter[filteredAccount] = new tokenExporterService(config.providerIpc, configERC20.erc20ABI, filteredAccount, createBlockNumber, now.getTime());
+      //tokenExporter[filteredAccount] = new tokenExporterService(config.selectParity(), configERC20.erc20ABI, filteredAccount, createBlockNumber, now.getTime());
       waitUntil()
         .interval(10)
         .times(100)
         .condition(function (cb) {
           process.nextTick(function () {
-            cb(tokenExporter[account].isLoaded);
+            cb(tokenExporter[filteredAccount].isLoaded);
           });
         })
         .done(function (result) {
