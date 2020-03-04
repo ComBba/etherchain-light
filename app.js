@@ -73,8 +73,11 @@ async.waterfall([
     //console.dir(contractsWithEventsLength);
     let sortable = [];
     for (let adr in contractsWithEventsLength) {
-      if (contractsWithEventsLength > 0)
+      if (contractsWithEventsLength[adr] > 0) {
         sortable.push([adr, contractsWithEventsLength[adr]]);
+      } else {
+        continue;
+      }
     }
     sortable.sort(function (a, b) {
       return Number(a[1]) - Number(b[1]);
@@ -83,7 +86,9 @@ async.waterfall([
     async.eachSeries(sortable, function (iter, forEachOfCallback) {
       var eventslength = iter[1],
         account = iter[0];
-      contractAccountList.push(account);
+      if (eventslength > 0) {
+        contractAccountList.push(account);
+      }
       //console.log(account,"start", Date.now());
 
       /*tokenExporter system error checking...
