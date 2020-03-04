@@ -145,7 +145,7 @@ var accountblanceschecker = function (config, configERC20, app) {
 						data = accountCode.account;
 						if (accountCode.code !== "0x" && !tokenExporter[accountCode.account]) {
 							var now = new Date();
-							tokenExporter[accountCode.account] = new tokenExporterService(config.providerIpc, configERC20.erc20ABI, accountCode.account, 1, now.getTime());
+							tokenExporter[accountCode.account] = new tokenExporterService(config.selectParity(), configERC20.erc20ABI, accountCode.account, 1, now.getTime());
 							app.set('tokenExporter', tokenExporter);
 						}
 
