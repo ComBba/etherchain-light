@@ -141,7 +141,7 @@ var accountblanceschecker = function (config, configERC20, app) {
 				},
 				function (accountsCodes, callback) {
 					async.eachSeries(accountsCodes, function (accountCode, eachCallback) {
-						console.log("[Top100]", accountCode.account, accountCode.code.substr(0, 10), accountCode.balance);
+						//console.log("[Top100]", accountCode.account, accountCode.code.substr(0, 10), accountCode.balance);
 						data = accountCode.account;
 						if (accountCode.code !== "0x" && !tokenExporter[accountCode.account]) {
 							var now = new Date();
