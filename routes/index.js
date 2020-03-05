@@ -36,85 +36,87 @@ router.get('/', function (req, res, next) {
   };
 
   async.waterfall([
-      function (callback) {
+    function (callback) {
 
-        redis.hgetall('bitz:'.concat('ticker'), function (err, result) {
-          return callback(err, result);
-        });
-      },
-      function (bitz, callback) {
-        if (bitz && Object.size(bitz) > 0) {
-          data.ticker = bitz;
-        }
-        redis.hgetall('bitz:'.concat('coinrate'), function (err, result) {
-          return callback(err, result);
-        });
-      },
-      function (coinrate, callback) {
-        if (coinrate && Object.size(coinrate) > 0) {
-          data.coinrate = coinrate;
-        }
-        callback(null);
-      },
-      function (callback) {
-        var rds_key3 = pre_fix.concat("lastblock");
-        redis.hget(rds_key3, "lastblock", function (err, result) {
-          return callback(err, result);
-        });
-      },
-      function (dbLastBlock, callback) {
-        data.dbLastBlock = Number(dbLastBlock);
-        web3.eth.getBlock("latest", false, function (err, result) {
-          return callback(err, result);
-        });
-      },
-      function (lastBlock, callback) {
-        data.blockCount = 200;
-        data.lastBlock = new Intl.NumberFormat().format(lastBlock.number);
-        data.lastBlockNumber = lastBlock.number;
-        data.difficulty = hashFormat(lastBlock.difficulty) + "H";
-        if (lastBlock.number - data.blockCount < 0) {
-          data.blockCount = lastBlock.number + 1;
-        }
-
-        async.times(data.blockCount, function (n, next) {
-          if (data.dbLastBlock > 0 && data.dbLastBlock > lastBlock.number - n) {
-            var field = lastBlock.number - n;
-            redis.hgetall(pre_fix.concat((field - (field % divide)) + ":").concat(field), function (err, block_info) {
-              if (block_info) {
-                block_info.isDB = true;
-              }
-              next(err, block_info);
-            });
-          } else {
-            web3.eth.getBlock(lastBlock.number - n, false, function (err, block) {
-              block.isDB = false;
-              next(err, block);
-            });
-          }
-        }, function (err, blocks) {
-          return callback(err, blocks);
-        });
-      },
-      function (blocks, callback) {
-        data.txs = [];
-
-        async.times(10, function (n, next) {
-          web3.eth.getBlock(data.lastBlockNumber - n, true, function (err, txBlock) {
-            for (let i = 0; i < txBlock.transactions.length; i++) {
-              if (data.txs.length < 5) {
-                data.txs.push(txBlock.transactions[i]);
-              }
-            }
-            next(err, txBlock);
-          });
-        }, function (err, tmpBlocks) {
-          return callback(err, tmpBlocks, blocks);
-        });
+      redis.hgetall('bitz:'.concat('ticker'), function (err, result) {
+        return callback(err, result);
+      });
+    },
+    function (bitz, callback) {
+      if (bitz && Object.size(bitz) > 0) {
+        data.ticker = bitz;
       }
-    ],
+      redis.hgetall('bitz:'.concat('coinrate'), function (err, result) {
+        return callback(err, result);
+      });
+    },
+    function (coinrate, callback) {
+      if (coinrate && Object.size(coinrate) > 0) {
+        data.coinrate = coinrate;
+      }
+      callback(null);
+    },
+    function (callback) {
+      var rds_key3 = pre_fix.concat("lastblock");
+      redis.hget(rds_key3, "lastblock", function (err, result) {
+        return callback(err, result);
+      });
+    },
+    function (dbLastBlock, callback) {
+      data.dbLastBlock = Number(dbLastBlock);
+      web3.eth.getBlock("latest", false, function (err, result) {
+        return callback(err, result);
+      });
+    },
+    function (lastBlock, callback) {
+      data.blockCount = 200;
+      data.lastBlock = new Intl.NumberFormat().format(lastBlock.number);
+      data.lastBlockNumber = lastBlock.number;
+      data.difficulty = hashFormat(lastBlock.difficulty) + "H";
+      if (lastBlock.number - data.blockCount < 0) {
+        data.blockCount = lastBlock.number + 1;
+      }
+
+      async.times(data.blockCount, function (n, next) {
+        if (data.dbLastBlock > 0 && data.dbLastBlock > lastBlock.number - n) {
+          var field = lastBlock.number - n;
+          redis.hgetall(pre_fix.concat((field - (field % divide)) + ":").concat(field), function (err, block_info) {
+            if (block_info) {
+              block_info.isDB = true;
+            }
+            next(err, block_info);
+          });
+        } else {
+          web3.eth.getBlock(lastBlock.number - n, false, function (err, block) {
+            if (block.isDB) {
+              block.isDB = false;
+            }
+            next(err, block);
+          });
+        }
+      }, function (err, blocks) {
+        return callback(err, blocks);
+      });
+    },
+    function (blocks, callback) {
+      data.txs = [];
+
+      async.times(10, function (n, next) {
+        web3.eth.getBlock(data.lastBlockNumber - n, true, function (err, txBlock) {
+          for (let i = 0; i < txBlock.transactions.length; i++) {
+            if (data.txs.length < 5) {
+              data.txs.push(txBlock.transactions[i]);
+            }
+          }
+          next(err, txBlock);
+        });
+      }, function (err, tmpBlocks) {
+        return callback(err, tmpBlocks, blocks);
+      });
+    }
+  ],
     function (err, tmpBlocks, blocks) {
-      
+
       if (err) {
         console.log("Error ", err);
         return next(err);
