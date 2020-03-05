@@ -73,11 +73,11 @@ async.waterfall([
     //console.dir(contractsWithEventsLength);
     let sortable = [];
     for (let adr in contractsWithEventsLength) {
-      if (contractsWithEventsLength[adr] > 0) {
-        sortable.push([adr, contractsWithEventsLength[adr]]);
-      } else {
-        continue;
-      }
+      //if (contractsWithEventsLength[adr] > 0) {
+      sortable.push([adr, contractsWithEventsLength[adr]]);
+      //} else {
+      continue;
+      //}
     }
     sortable.sort(function (a, b) {
       return Number(a[1]) - Number(b[1]);
@@ -88,9 +88,9 @@ async.waterfall([
     async.eachSeries(filtered, function (iter, forEachOfCallback) {
       var eventslength = iter[1],
         filteredAccount = iter[0];
-      if (eventslength > 0) {
-        contractAccountList.push(filteredAccount);
-      }
+      //if (eventslength > 0) {
+      contractAccountList.push(filteredAccount);
+      //}
       /*tokenExporter system error checking...
              redis.hget('ExportToken:createBlock:', filteredAccount, function (err, createBlockNumber) {
               if (!createBlockNumber) {
