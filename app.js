@@ -104,7 +104,7 @@ async.waterfall([
       tokenExporter[filteredAccount] = new tokenExporterService(config.providerIpc, configERC20.erc20ABI, filteredAccount, createBlockNumber, now.getTime());
       //tokenExporter[filteredAccount] = new tokenExporterService(config.selectParity(), configERC20.erc20ABI, filteredAccount, createBlockNumber, now.getTime());
       waitUntil()
-        .interval(10)
+        .interval(100)
         .times(100)
         .condition(function (cb) {
           process.nextTick(function () {
