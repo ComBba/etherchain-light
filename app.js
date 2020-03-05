@@ -7,6 +7,7 @@ let logger = require('morgan');
 let cookieParser = require('cookie-parser');
 let bodyParser = require('body-parser');
 let waitUntil = require('wait-until');
+var Web3 = require('web3');
 
 let index = require('./routes/index');
 let blocks = require('./routes/blocks');
@@ -103,7 +104,7 @@ async.waterfall([
       //console.log(filteredAccount, eventslength, "start", Date.now());
       //tokenExporter[filteredAccount] = new tokenExporterService(config.providerIpc, configERC20.erc20ABI, filteredAccount, createBlockNumber, now.getTime());
       //tokenExporter[filteredAccount] = new tokenExporterService(config.selectParity(), configERC20.erc20ABI, filteredAccount, createBlockNumber, now.getTime());
-      var provider = new web3.providers.HttpProvider(configConstant.localRPCaddress);
+      var provider = new Web3.providers.HttpProvider(configConstant.localRPCaddress);
       tokenExporter[filteredAccount] = new tokenExporterService(provider, configERC20.erc20ABI, filteredAccount, createBlockNumber, now.getTime());
       waitUntil()
         .interval(100)
