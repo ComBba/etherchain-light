@@ -49,8 +49,8 @@ var exporter = function (provider, erc20ABI, tokenAddress, createBlock, startTim
   });
 
   self.web3 = new Web3();
-  self.web3.setProvider(new self.web3.providers.HttpProvider(configConstant.remoteRPCaddress));
-  //self.web3.setProvider(provider);
+  //self.web3.setProvider(new self.web3.providers.HttpProvider(configConstant.remoteRPCaddress));
+  self.web3.setProvider(provider);
 
   self.contract = self.web3.eth.contract(erc20ABI).at(tokenAddress);
 
