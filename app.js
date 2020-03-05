@@ -101,10 +101,12 @@ async.waterfall([
       createBlockNumber = 1;
       var now = new Date();
       //console.log(filteredAccount, eventslength, "start", Date.now());
-      tokenExporter[filteredAccount] = new tokenExporterService(config.providerIpc, configERC20.erc20ABI, filteredAccount, createBlockNumber, now.getTime());
+      //tokenExporter[filteredAccount] = new tokenExporterService(config.providerIpc, configERC20.erc20ABI, filteredAccount, createBlockNumber, now.getTime());
       //tokenExporter[filteredAccount] = new tokenExporterService(config.selectParity(), configERC20.erc20ABI, filteredAccount, createBlockNumber, now.getTime());
+      var provider = new web3.providers.HttpProvider(configConstant.localRPCaddress);
+      tokenExporter[filteredAccount] = new tokenExporterService(provider, configERC20.erc20ABI, filteredAccount, createBlockNumber, now.getTime());
       waitUntil()
-        .interval(500)
+        .interval(100)
         .times(100)
         .condition(function (cb) {
           process.nextTick(function () {
