@@ -74,11 +74,11 @@ async.waterfall([
     //console.dir(contractsWithEventsLength);
     let sortable = [];
     for (let adr in contractsWithEventsLength) {
-      //if (contractsWithEventsLength[adr] > 0) {
+      if (contractsWithEventsLength[adr] > 0) {
       sortable.push([adr, contractsWithEventsLength[adr]]);
-      //} else {
+      } else {
       continue;
-      //}
+      }
     }
     sortable.sort(function (a, b) {
       return Number(a[1]) - Number(b[1]);
@@ -89,9 +89,9 @@ async.waterfall([
     async.eachSeries(filtered, function (iter, forEachOfCallback) {
       var eventslength = iter[1],
         filteredAccount = iter[0];
-      //if (eventslength > 0) {
+      if (eventslength > 0) {
       contractAccountList.push(filteredAccount);
-      //}
+      }
       /*tokenExporter system error checking...
              redis.hget('ExportToken:createBlock:', filteredAccount, function (err, createBlockNumber) {
               if (!createBlockNumber) {
@@ -103,11 +103,11 @@ async.waterfall([
       var now = new Date();
       //console.log(filteredAccount, eventslength, "start", Date.now());
       //tokenExporter[filteredAccount] = new tokenExporterService(config.providerIpc, configERC20.erc20ABI, filteredAccount, createBlockNumber, now.getTime());
-      //tokenExporter[filteredAccount] = new tokenExporterService(config.selectParity(), configERC20.erc20ABI, filteredAccount, createBlockNumber, now.getTime());
-      var provider = new Web3.providers.HttpProvider(configConstant.localRPCaddress);
-      tokenExporter[filteredAccount] = new tokenExporterService(provider, configERC20.erc20ABI, filteredAccount, createBlockNumber, now.getTime());
+      tokenExporter[filteredAccount] = new tokenExporterService(config.selectParity(), configERC20.erc20ABI, filteredAccount, createBlockNumber, now.getTime());
+      //var provider = new Web3.providers.HttpProvider(configConstant.localRPCaddress);
+      //tokenExporter[filteredAccount] = new tokenExporterService(provider, configERC20.erc20ABI, filteredAccount, createBlockNumber, now.getTime());
       waitUntil()
-        .interval(100)
+        .interval(10)
         .times(100)
         .condition(function (cb) {
           process.nextTick(function () {
