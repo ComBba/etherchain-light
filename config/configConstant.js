@@ -7,7 +7,8 @@ const configConstant = {
   ipcPath: "/home/barahime/.local/share/io.parity.ethersocial/jsonrpc.ipc",
 
   //network
-  arrParity: ['http://115.68.5.49:7545', 'http://parity1.esn.today:80', 'http://parity2.esn.today:80'],
+  //arrParity: ['http://115.68.5.49:7545', 'http://parity1.esn.today:80', 'http://parity2.esn.today:80'],
+  arrParity: ['http://115.68.5.49:7545'],
   remoteRPCaddress: 'http://115.68.5.49:7545',
   localRPCaddress: 'http://127.0.0.1:17545',
   gethNetworkPortString: "50505",
